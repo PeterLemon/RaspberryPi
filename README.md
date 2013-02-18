@@ -34,7 +34,7 @@ cma_hwm=32
 
 Checkout http://elinux.org/RPiconfig for more info about config options...
 
-Once you have all these files ready, you can copy them + a kernel.img file to the root of an SD card.
+Once you have all these files ready, you can copy them & a kernel.img file to the root of an SD card.
 
 All of my demos use a maximum resolution of 640x480, they have been tested using composite & HDMI.
 
