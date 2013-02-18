@@ -1,7 +1,7 @@
 RaspberryPi
 ===========
 
-Raspberry Pi Bare Metal Code by Peter Lemon.
+Raspberry Pi Bare Metal Code by krom (Peter Lemon).
 
 All code compiles out of box with the FASMARM assembler by revolution.
 I have included binaries of all the demos...
