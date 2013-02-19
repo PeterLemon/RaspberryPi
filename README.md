@@ -4,7 +4,7 @@ RaspberryPi
 Raspberry Pi Bare Metal Code by krom (Peter Lemon).
 
 All code compiles out of box with the FASMARM assembler by revolution.
-I have included binaries of all the demos...
+I have included binaries of all the demos.
 
 Special thanks to Dex (Craig Bamford), who helped me get my 1st pixel on the screen =D
 Please check out his Raspberry Pi port of DexOS, a lightning fast bare metal OS!!
@@ -32,10 +32,10 @@ gpu_mem_512=316
 cma_lwm=16
 cma_hwm=32
 
-Checkout http://elinux.org/RPiconfig for more info about config options...
+Checkout http://elinux.org/RPiconfig for more info about config options.
 
 Once you have all these files ready, you can copy them & a kernel.img file to the root of an SD card.
 
 All of my demos use a maximum resolution of 640x480, they have been tested using composite & HDMI.
 
-All sound demos output to the analog headphone port...
+All sound demos output to the analog headphone port.
