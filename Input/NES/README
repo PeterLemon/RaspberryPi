@@ -1,0 +1,55 @@
+NES Controller On Raspberry Pi:
+________________________________________________________
+
+Pin Names:
+__________
+Ground = G
+Clock  = C
+Latch  = L
+Data   = D
+Power  = P
+Unused = X
+________________________________________________________
+
+NES Controller Port:
+_____________
+\(G)(C)(L)(D)|
+ \           |
+  \          |
+   \(P)(X)(X)|
+    \________|
+________________________________________________________
+
+Raspberry Pi GPIO Pins:
+_______________________
+
+ 1   2
+________
+        |
+(P) (X) | P1-01: (P)ower  (GPIO 3.3V)
+(X) (X) |
+(X) (G) | P2-06: (G)round (GPIO GND)
+(D) (X) | P1-07: (D)ata   (GPIO 4)
+(X) (X) |
+(X) (X) |
+(X) (X) |
+(X) (X) |
+(X) (X) |
+(C) (X) | P1-19: (C)lock  (GPIO 10)
+(X) (X) |
+(L) (X) | P1-23: (L)atch  (GPIO 11)
+(X) (X) |
+        |
+25  26  |
+________________________________________________________
+
+GPIO Pin Function Select:
+____________________________
+          |                 |
+ Pin    # | Function Select |
+__________|_________________|
+          |                 |
+(D)ata   4| Input (Default) |
+(C)lock 10| Output          |
+(L)atch 11| Output          |
+__________|_________________|
