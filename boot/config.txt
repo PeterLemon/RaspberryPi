@@ -1,6 +1,0 @@
-disable_overscan=1 
-force_turbo=1
-gpu_mem_256=160
-gpu_mem_512=316
-cma_lwm=16
-cma_hwm=32
