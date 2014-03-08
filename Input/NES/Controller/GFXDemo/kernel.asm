@@ -20,11 +20,11 @@ include 'LIB\R_PI.INC'
 JOY_RIGHT  = 00000001b
 JOY_LEFT   = 00000010b
 JOY_DOWN   = 00000100b
-JOY_UP	   = 00001000b
+JOY_UP     = 00001000b
 JOY_START  = 00010000b
 JOY_SELECT = 00100000b
-JOY_B	   = 01000000b
-JOY_A	   = 10000000b
+JOY_B      = 01000000b
+JOY_A      = 10000000b
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
@@ -81,11 +81,11 @@ UpdateInput:
   imm32 r0,PERIPHERAL_BASE + GPIO_BASE ; Set GPIO 11 (Latch) Output State To HIGH
   mov r1,GPIO_11
   str r1,[r0,GPIO_GPSET0]
-  Delay 6
+  Delay 32
 
   mov r1,GPIO_11 ; Set GPIO 11 (Latch) Output State To LOW
   str r1,[r0,GPIO_GPCLR0]
-  Delay 6
+  Delay 32
 
   mov r1,0 ; R1 = Input Data
   mov r2,7 ; R2 = Input Data Count
@@ -97,11 +97,11 @@ UpdateInput:
 
     mov r3,GPIO_10 ; Set GPIO 10 (Clock) Output State To HIGH
     str r3,[r0,GPIO_GPSET0]
-    Delay 6
+    Delay 32
 
     mov r3,GPIO_10 ; Set GPIO 10 (Clock) Output State To LOW
     str r3,[r0,GPIO_GPCLR0]
-    Delay 6
+    Delay 32
 
     subs r2,1
     bge LoopInputData ; Loop 8bit Data
