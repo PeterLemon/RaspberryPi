@@ -122,7 +122,7 @@ and r0,r1,$300000
 cmp r0,MOUSE_SPDFST ; Compare IF On "Fast" Speed Phase, Otherwise Update Input
 bne UpdateInput
 
-ldr r0,[MOUSE_DATA] ; Compare Old & New Mouse XY Data To Old Data, IF == Mouse Has Not Moved
+ldr r0,[MOUSE_DATA] ; Compare Old & New Mouse XY Data, IF == Mouse Has Not Moved
 cmp r1,r0
 beq SkipXYPos
 
