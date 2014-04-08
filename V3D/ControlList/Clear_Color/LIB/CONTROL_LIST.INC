@@ -218,7 +218,7 @@ Single_Clipped_Primitive_Data_Address = $FFFFFFF8 ; Clipped Primitive With Compr
 Escape_Terminated_Compressed_List = $FF ; Clipped Primitive With Compressed Primitive List: Escape Terminated Compressed List
 macro Clipped_Primitive_With_Compressed_Primitive_List data, address { ; Control ID Code: Clipped Primitive With Compressed Primitive List (R)
   db $31 ; Control ID Code Byte: ID Code #49
-  dw (address * 8) + data ; Control ID Data Record Word: Address Of Single Clipped Primitive Data (Multiple Of 8 Bytes) (Bit 3..31), 1 Flag Per Vertex Of Next Primitive (Bit 0..2)
+  dw address + data ; Control ID Data Record Word: Address Of Single Clipped Primitive Data (Multiple Of 8 Bytes) (Bit 3..31), 1 Flag Per Vertex Of Next Primitive (Bit 0..2)
   ; Control ID Data Record Bytes: Escape Terminated List (Bit 32..X)
 }
 
@@ -274,7 +274,7 @@ Fragment_Shader_Code_Address     = $FFFFFFF8 ; VG_Inline_Shader_Record: Fragment
 Fragment_Shader_Uniforms_Address = $FFFFFFFF ; VG_Inline_Shader_Record: Fragment Shader Uniforms Address (4-Byte Aligned)
 macro VG_Inline_Shader_Record data, addressc, addressu { ; Control ID Code: VG Inline Shader Record
   db $43 ; Control ID Code Byte: ID Code #67
-  dw (addressc * 8) + data ; Control ID Data Record Word: Fragment Shader Code Address (8-Byte Multiple) (Bit 3..31), Data Record (Bit 0..2)
+  dw addressc + data ; Control ID Data Record Word: Fragment Shader Code Address (8-Byte Multiple) (Bit 3..31), Data Record (Bit 0..2)
   dw addressu ; Control ID Data Record Word: Fragment Shader Uniforms Address (4-Byte Aligned) (Bit 32..63)
 }
 
