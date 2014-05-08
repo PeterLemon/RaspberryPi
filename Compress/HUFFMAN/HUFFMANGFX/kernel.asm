@@ -32,11 +32,11 @@ FB_Init:
 imm32 r0,Huff ; R0 = Source Address, R1 = Destination Address
 
 ldr r2,[r0],4 ; R2 = Data Length & Header Info
-mov r2,r2,lsr 8 ; R2 = Data Length
+lsr r2,8 ; R2 = Data Length
 add r2,r1 ; R2 = Destination End Offset
 
 ldrb r3,[r0],1 ; R0 = Tree Table, R3 = (Tree Table Size / 2) - 1
-mov r3,r3,lsl 1
+lsl r3,1
 add r3,1 ; R3 = Tree Table Size
 add r3,r0 ; R3 = Compressed Bitstream Offset
 
@@ -62,13 +62,13 @@ HuffChunkLoop:
     bne HuffByteLoop
 
     and r7,r6,$3F ; R7 = Offset To Next Child Node
-    mov r7,r7,lsl 1
+    lsl r7,1
     add r7,2 ; R7 = Node0 Child Offset * 2 + 2
     and r9,$FFFFFFFE ; R9 = Tree Offset NOT 1
     add r9,r7 ; R9 = Node0 Child Offset
 
     tst r4,r5 ; Test Node Bit (0 = Node0, 1 = Node1)
-    mov r5,r5,lsr 1 ; Shift R5 To Next Node Bit
+    lsr r5,1 ; Shift R5 To Next Node Bit
     addne r9,1 ; R9 = Node1 Child Offset
     moveq r10,$80 ; r10 = Test Node0 End Flag
     movne r10,$40 ; r10 = Test Node1 End Flag
