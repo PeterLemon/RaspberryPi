@@ -25,7 +25,7 @@ FB_Init:
   imm32 r0,PERIPHERAL_BASE + MAIL_BASE
   imm32 r1,FB_STRUCT
   orr r1,MAIL_FB
-  str r1,[r0,MAIL_WRITE + MAIL_FB] ; Mail Box Write
+  str r1,[r0,MAIL_WRITE] ; Mail Box Write
 
   FB_Read:
     ldr r1,[r0,MAIL_READ]
