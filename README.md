@@ -40,7 +40,7 @@ gpu_mem_512=316<br />
 cma_lwm=16<br />
 cma_hwm=32<br />
 <br />
-Check http://elinux.org/RPiconfig for more info about config options.<br />
+Check http://www.raspberrypi.org/documentation/configuration/config-txt.md for more info about config options.<br />
 Check https://github.com/PeterLemon/RaspberryPi/tree/master/boot for .txt files.<br />
 <br />
 Once you have all these files ready, you can copy them & a kernel.img file to the root of an SD card.<br />
