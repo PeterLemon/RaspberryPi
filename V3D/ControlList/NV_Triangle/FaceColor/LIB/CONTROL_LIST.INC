@@ -136,15 +136,15 @@ macro Load_Tile_Buffer_General data16, data32, address { ; Control ID Code: Load
 ; Primitive Lists
 ;;;;;;;;;;;;;;;;;;
 ; Indexed_Primitive_List: Indexed Primitive List (OpenGL) Control ID Code Data Record Description
-Mode_Points         = $01 ; Indexed_Primitive_List: Primitive Mode = Points
-Mode_Lines          = $02 ; Indexed_Primitive_List: Primitive Mode = Lines
-Mode_Line_Loop      = $04 ; Indexed_Primitive_List: Primitive Mode = Line Loop
-Mode_Line_Strip     = $08 ; Indexed_Primitive_List: Primitive Mode = Line Strip
-Mode_Triangles      = $10 ; Indexed_Primitive_List: Primitive Mode = Triangles
-Mode_Triangle_Strip = $20 ; Indexed_Primitive_List: Primitive Mode = Triangle Strip
-Mode_Triangle_Fan   = $40 ; Indexed_Primitive_List: Primitive Mode = Triangle Fan
+Mode_Points         = $00 ; Indexed_Primitive_List: Primitive Mode = Points
+Mode_Lines          = $01 ; Indexed_Primitive_List: Primitive Mode = Lines
+Mode_Line_Loop      = $02 ; Indexed_Primitive_List: Primitive Mode = Line Loop
+Mode_Line_Strip     = $03 ; Indexed_Primitive_List: Primitive Mode = Line Strip
+Mode_Triangles      = $04 ; Indexed_Primitive_List: Primitive Mode = Triangles
+Mode_Triangle_Strip = $05 ; Indexed_Primitive_List: Primitive Mode = Triangle Strip
+Mode_Triangle_Fan   = $06 ; Indexed_Primitive_List: Primitive Mode = Triangle Fan
 Index_Type_8  = $00 ; Indexed_Primitive_List: Index Type = 8-Bit
-Index_Type_16 = $80 ; Indexed_Primitive_List: Index Type = 16-Bit
+Index_Type_16 = $10 ; Indexed_Primitive_List: Index Type = 16-Bit
 Indices_Length       = $FFFFFFFF ; Indexed_Primitive_List: Length (Number Of Indices)
 Indices_List_Address = $FFFFFFFF ; Indexed_Primitive_List: Address Of Indices List
 Maximum_Index        = $FFFFFFFF ; Indexed_Primitive_List: Maximum Index (Primitives Using A Greater Index Will Cause Error)
@@ -157,13 +157,13 @@ macro Indexed_Primitive_List data, length, address, maxindex { ; Control ID Code
 }
 
 ; Vertex_Array_Primitives: Vertex Array Primitives (OpenGL) Control ID Code Data Record Description
-Mode_Points         = $01 ; Vertex_Array_Primitives: Primitives Mode = Points
-Mode_Lines          = $02 ; Vertex_Array_Primitives: Primitives Mode = Lines
-Mode_Line_Loop      = $04 ; Vertex_Array_Primitives: Primitives Mode = Line Loop
-Mode_Line_Strip     = $08 ; Vertex_Array_Primitives: Primitives Mode = Line Strip
-Mode_Triangles      = $10 ; Vertex_Array_Primitives: Primitives Mode = Triangles
-Mode_Triangle_Strip = $20 ; Vertex_Array_Primitives: Primitives Mode = Triangle Strip
-Mode_Triangle_Fan   = $40 ; Vertex_Array_Primitives: Primitives Mode = Triangle Fan
+Mode_Points         = $00 ; Vertex_Array_Primitives: Primitives Mode = Points
+Mode_Lines          = $01 ; Vertex_Array_Primitives: Primitives Mode = Lines
+Mode_Line_Loop      = $02 ; Vertex_Array_Primitives: Primitives Mode = Line Loop
+Mode_Line_Strip     = $03 ; Vertex_Array_Primitives: Primitives Mode = Line Strip
+Mode_Triangles      = $04 ; Vertex_Array_Primitives: Primitives Mode = Triangles
+Mode_Triangle_Strip = $05 ; Vertex_Array_Primitives: Primitives Mode = Triangle Strip
+Mode_Triangle_Fan   = $06 ; Vertex_Array_Primitives: Primitives Mode = Triangle Fan
 Vertices_Length    = $FFFFFFFF ; Vertex_Array_Primitives: Length (Number Of Vertices)
 First_Vertex_Index = $FFFFFFFF ; Vertex_Array_Primitives: Index Of First Vertex
 macro Vertex_Array_Primitives data, length, index { ; Control ID Code: Vertex Array Primitives (OpenGL)
@@ -174,12 +174,12 @@ macro Vertex_Array_Primitives data, length, index { ; Control ID Code: Vertex Ar
 }
 
 ; VG_Coordinate_Array_Primitives: VG Coordinate Array Primitives (Only For Use In VG Shader Mode) Control ID Code Data Record Description
-Primitives_Type_RHT            = $02 ; VG_Coordinate_Array_Primitives: Primitives Type = RHT
-Primitives_Type_RHT_Strip      = $08 ; VG_Coordinate_Array_Primitives: Primitives Type = RHT Strip
-Primitives_Type_Triangles      = $10 ; VG_Coordinate_Array_Primitives: Primitives Type = Triangles
-Primitives_Type_Triangle_Strip = $20 ; VG_Coordinate_Array_Primitives: Primitives Type = Triangle Strip
-Primitives_Type_Triangle_Fan   = $40 ; VG_Coordinate_Array_Primitives: Primitives Type = Triangle Fan
-Triangle_Fan_Continuation_List = $80 ; VG_Coordinate_Array_Primitives: Continuation List (For Triangle Fans Only)
+Primitives_Type_RHT            = $01 ; VG_Coordinate_Array_Primitives: Primitives Type = RHT
+Primitives_Type_RHT_Strip      = $03 ; VG_Coordinate_Array_Primitives: Primitives Type = RHT Strip
+Primitives_Type_Triangles      = $04 ; VG_Coordinate_Array_Primitives: Primitives Type = Triangles
+Primitives_Type_Triangle_Strip = $05 ; VG_Coordinate_Array_Primitives: Primitives Type = Triangle Strip
+Primitives_Type_Triangle_Fan   = $06 ; VG_Coordinate_Array_Primitives: Primitives Type = Triangle Fan
+Triangle_Fan_Continuation_List = $F0 ; VG_Coordinate_Array_Primitives: Continuation List (For Triangle Fans Only)
 Primitives_Length        = $FFFFFFFF ; VG_Coordinate_Array_Primitives: Length (Number Of Primitives)
 Coordinate_Array_Address = $FFFFFFFF ; VG_Coordinate_Array_Primitives: Address Of Coordinate Array (32-Bit X,Y Screen Coordinates) 
 macro VG_Coordinate_Array_Primitives data, length, address { ; Control ID Code: VG Coordinate Array Primitives (Only For Use In VG Shader Mode)
@@ -190,12 +190,12 @@ macro VG_Coordinate_Array_Primitives data, length, address { ; Control ID Code: 
 }
 
 ; VG_Inline_Primitives: VG Inline Primitives (Only For Use In VG Shader Mode) Control ID Code Data Record Description
-Primitives_Type_RHT            = $02 ; VG_Inline_Primitives: Primitives Type = RHT
-Primitives_Type_RHT_Strip      = $08 ; VG_Inline_Primitives: Primitives Type = RHT Strip
-Primitives_Type_Triangles      = $10 ; VG_Inline_Primitives: Primitives Type = Triangles
-Primitives_Type_Triangle_Strip = $20 ; VG_Inline_Primitives: Primitives Type = Triangle Strip
-Primitives_Type_Triangle_Fan   = $40 ; VG_Inline_Primitives: Primitives Type = Triangle Fan
-Triangle_Fan_Continuation_List = $80 ; VG_Inline_Primitives: Continuation List (For Triangle Fans Only)
+Primitives_Type_RHT            = $01 ; VG_Inline_Primitives: Primitives Type = RHT
+Primitives_Type_RHT_Strip      = $03 ; VG_Inline_Primitives: Primitives Type = RHT Strip
+Primitives_Type_Triangles      = $04 ; VG_Inline_Primitives: Primitives Type = Triangles
+Primitives_Type_Triangle_Strip = $05 ; VG_Inline_Primitives: Primitives Type = Triangle Strip
+Primitives_Type_Triangle_Fan   = $06 ; VG_Inline_Primitives: Primitives Type = Triangle Fan
+Triangle_Fan_Continuation_List = $F0 ; VG_Inline_Primitives: Continuation List (For Triangle Fans Only)
 Escape_Terminated_Coordinate_List = $FFFFFFFF ; VG_Inline_Primitives: Escape Terminated Uncompressed 32-Bit X,Y Coordinate List
 macro VG_Inline_Primitives data { ; Control ID Code: VG Inline Primitives (Only For Use In VG Shader Mode)
   db $2A ; Control ID Code Byte: ID Code #42
@@ -223,12 +223,12 @@ macro Clipped_Primitive_With_Compressed_Primitive_List data, address { ; Control
 }
 
 ; Primitive_List_Format: Primitive List Format Control ID Code Data Record Description
-Primitive_Type_Points    = $01 ; Primitive List Format: Primitive Type = Points
-Primitive_Type_Lines     = $02 ; Primitive List Format: Primitive Type = Lines
-Primitive_Type_Triangles = $04 ; Primitive List Format: Primitive Type = Triangles
-Primitive_Type_RHT       = $08 ; Primitive List Format: Primitive Type = RHT
-Data_Type_Index_16       = $20 ; Primitive List Format: Data Type = 16-Bit Index
-Data_Type_XY_32          = $80 ; Primitive List Format: Data Type = 32-Bit X/Y
+Primitive_Type_Points    = $00 ; Primitive List Format: Primitive Type = Points
+Primitive_Type_Lines     = $01 ; Primitive List Format: Primitive Type = Lines
+Primitive_Type_Triangles = $02 ; Primitive List Format: Primitive Type = Triangles
+Primitive_Type_RHT       = $03 ; Primitive List Format: Primitive Type = RHT
+Data_Type_Index_16       = $10 ; Primitive List Format: Data Type = 16-Bit Index
+Data_Type_XY_32          = $30 ; Primitive List Format: Data Type = 32-Bit X/Y
 macro Primitive_List_Format data { ; Control ID Code: Primitive List Format (R)
   db $38 ; Control ID Code Byte: ID Code #56
   db data ; Control ID Data Record Byte: (Bit 0..7)
@@ -295,8 +295,8 @@ Rasteriser_Oversample_Mode_16X  = $80 ; Configuration_Bits: Rasteriser Oversampl
 Coverage_Pipe_Select          = $0001 ; Configuration_Bits: Coverage Pipe Select
 Coverage_Update_Mode_Non_Zero = $0000 ; Configuration_Bits: Coverage Update Mode = Non Zero
 Coverage_Update_Mode_Odd      = $0002 ; Configuration_Bits: Coverage Update Mode = Odd
-Coverage_Update_Mode_OR       = $0003 ; Configuration_Bits: Coverage Update Mode = OR
-Coverage_Update_Mode_Zero     = $0004 ; Configuration_Bits: Coverage Update Mode = Zero
+Coverage_Update_Mode_OR       = $0004 ; Configuration_Bits: Coverage Update Mode = OR
+Coverage_Update_Mode_Zero     = $0006 ; Configuration_Bits: Coverage Update Mode = Zero
 Coverage_Read_Mode_Clear_On_Read = $0000 ; Configuration_Bits: Coverage Read Mode = Clear On Read
 Coverage_Read_Mode_Leave_On_Read = $0008 ; Configuration_Bits: Coverage Read Mode = Leave On Read
 Depth_Test_Function_Never  = $0000 ; Configuration_Bits: Depth-Test Function = Never
