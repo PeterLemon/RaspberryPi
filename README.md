@@ -35,6 +35,7 @@ You will need to create a "config.txt" file that contains the lines:<br />
 disable_overscan=1<br />
 disable_pvt=1<br />
 force_turbo=1<br />
+framebuffer_swap=0<br />
 gpu_mem_256=160<br />
 gpu_mem_512=316<br />
 cma_lwm=16<br />
