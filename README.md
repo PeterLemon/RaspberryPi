@@ -12,6 +12,8 @@ Please check out DexOS, a lightning fast bare metal OS, & his Raspberry Pi port 
 http://www.dex-os.com<br />
 http://www.dex-os.com/DexBasic/DexBasic.htm<br />
 <br />
+Also special thanks to phire, who helped me get my 1st triangle on the screen using the GPU =D<br />
+<br />
 For more information about coding the ARM CPU please visit my webpage that I run with SimonB:<br />
 http://gbadev.org<br />
 http://forum.gbadev.org<br />
