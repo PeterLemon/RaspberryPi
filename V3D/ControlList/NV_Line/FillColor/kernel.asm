@@ -1,4 +1,4 @@
-; Raspberry Pi 'Bare Metal' V3D Vertex Color NV Triangle Control List Demo by krom (Peter Lemon):
+; Raspberry Pi 'Bare Metal' V3D Fill Color NV Line Control List Demo by krom (Peter Lemon):
 ; 1. Run Tags & Set V3D Frequency To 250MHz, & Enable Quad Processing Unit
 ; 2. Setup Frame Buffer
 ; 3. Setup & Run V3D Control List Rendered Tile Buffer
@@ -115,7 +115,7 @@ CONTROL_LIST_BIN_STRUCT: ; Control List Of Concatenated Control Records & Data S
   Configuration_Bits Enable_Forward_Facing_Primitive + Enable_Reverse_Facing_Primitive, Early_Z_Updates_Enable ; Configuration Bits
   Viewport_Offset 0, 0 ; Viewport Offset
   NV_Shader_State NV_SHADER_STATE_RECORD ; NV Shader State (No Vertex Shading)
-  Indexed_Primitive_List Mode_Triangles + Index_Type_8, 3, VERTEX_LIST, 2 ; Indexed Primitive List (OpenGL)
+  Indexed_Primitive_List Mode_Lines + Index_Type_8, 2, VERTEX_LIST, 1 ; Indexed Primitive List (OpenGL)
   Flush ; Flush (Add Return-From-Sub-List To Tile Lists & Then Flush Tile Lists To Memory) (B)
 CONTROL_LIST_BIN_END:
 
@@ -461,9 +461,9 @@ CONTROL_LIST_RENDER_END:
 align 16 ; 128-Bit Align
 NV_SHADER_STATE_RECORD: ; NV Shader State Record
   db 0 ; Flag Bits: 0 = Fragment Shader Is Single Threaded, 1 = Point Size Included In Shaded Vertex Data, 2 = Enable Clipping, 3 = Clip Coordinates Header Included In Shaded Vertex Data
-  db 6 * 4 ; Shaded Vertex Data Stride
+  db 3 * 4 ; Shaded Vertex Data Stride
   db 0 ; Fragment Shader Number Of Uniforms (Not Used Currently)
-  db 3 ; Fragment Shader Number Of Varyings
+  db 0 ; Fragment Shader Number Of Varyings
   dw FRAGMENT_SHADER_CODE ; Fragment Shader Code Address
   dw 0 ; Fragment Shader Uniforms Address
   dw VERTEX_DATA ; Shaded Vertex Data Address (128-Bit Aligned If Including Clip Coordinate Header)
@@ -476,51 +476,32 @@ VERTEX_LIST: ; Vertex List
 
 align 16 ; 128-Bit Align
 VERTEX_DATA: ; Vertex List
-  ; Vertex: Top, Red
-  dh 320 * 16 ; X In 12.4 Fixed Point
-  dh  32 * 16 ; Y In 12.4 Fixed Point
+  ; Vertex: Top Left
+  dh 32 * 16 ; X In 12.4 Fixed Point
+  dh 32 * 16 ; Y In 12.4 Fixed Point
   dw 1.0 ; Z
   dw 1.0 ; 1 / W
-  dw 1.0 ; Varying 0 (Red)
-  dw 0.0 ; Varying 1 (Green)
-  dw 0.0 ; Varying 2 (Blue)
 
-  ; Vertex: Bottom Left, Green
-  dh  32 * 16 ; X In 12.4 Fixed Point
-  dh 448 * 16 ; Y In 12.4 Fixed Point
-  dw 1.0 ; Z
-  dw 1.0 ; 1 / W
-  dw 0.0 ; Varying 0 (Red)
-  dw 1.0 ; Varying 1 (Green)
-  dw 0.0 ; Varying 2 (Blue)
-
-  ; Vertex: Bottom Right, Blue
+  ; Vertex: Bottom Right
   dh 608 * 16 ; X In 12.4 Fixed Point
   dh 448 * 16 ; Y In 12.4 Fixed Point
   dw 1.0 ; Z
   dw 1.0 ; 1 / W
-  dw 0.0 ; Varying 0 (Red)
-  dw 0.0 ; Varying 1 (Green)
-  dw 1.0 ; Varying 2 (Blue)
 
 align 16 ; 128-Bit Align
 FRAGMENT_SHADER_CODE:
-  ; Vertex Color Shader
-  dw $958E0DBF
-  dw $D1724823 ; mov r0, vary; mov r3.8d, 1.0
-  dw $818E7176
-  dw $40024821 ; fadd r0, r0, r5; mov r1, vary
-  dw $818E7376
-  dw $10024862 ; fadd r1, r1, r5; mov r2, vary
-  dw $819E7540
-  dw $114248A3 ; fadd r2, r2, r5; mov r3.8a, r0
-  dw $809E7009
-  dw $115049E3 ; nop; mov r3.8b, r1
-  dw $809E7012
-  dw $116049E3 ; nop; mov r3.8c, r2
-  dw $159E76C0
-  dw $30020BA7 ; mov tlbc, r3; nop; thrend
-  dw $009E7000
+  ; Fill Color Shader
+  dw $009E7000 ;
   dw $100009E7 ; nop; nop; nop
-  dw $009E7000
+
+  dw $FFFFFFFF ; RGBA White
+  dw $E0020BA7 ; ldi tlbc, $FFFFFFFF
+  dw $009E7000 ;
   dw $500009E7 ; nop; nop; sbdone
+  dw $009E7000 ;
+  dw $300009E7 ; nop; nop; thrend
+
+  dw $009E7000 ;
+  dw $100009E7 ; nop; nop; nop
+  dw $009E7000 ;
+  dw $100009E7 ; nop; nop; nop
