@@ -51,22 +51,25 @@ strb r0,[r1],1
 lsr r0,8
 strb r0,[r1],1
 
+; Run Binning Control List (Thread 0)
 imm32 r0,PERIPHERAL_BASE + V3D_BASE ; Load V3D Base Address
+imm32 r1,CONTROL_LIST_BIN_STRUCT ; Store Control List Executor Binning Thread 0 Current Address
+str r1,[r0,V3D_CT0CA]
+imm32 r1,CONTROL_LIST_BIN_END ; Store Control List Executor Binning Thread 0 End Address
+str r1,[r0,V3D_CT0EA] ; When End Address Is Stored Control List Thread Executes
+
+WaitBinControlList: ; Wait For Control List To Execute
+  ldr r1,[r0,V3D_BFC] ; Load Flush Count
+  tst r1,1 ; Test IF PTB Has Flushed All Tile Lists To Memory
+  beq WaitBinControlList
+
+; Run Rendering Control List (Thread 1)
+imm32 r1,CONTROL_LIST_RENDER_STRUCT ; Store Control List Executor Rendering Thread 1 Current Address
+str r1,[r0,V3D_CT1CA]
+imm32 r1,CONTROL_LIST_RENDER_END ; Store Control List Executor Rendering Thread 1 End Address
+str r1,[r0,V3D_CT1EA] ; When End Address Is Stored Control List Thread Executes
+
 Loop:
-  imm32 r1,CONTROL_LIST_BIN_STRUCT ; Store Control List Executor Binning Thread 0 Current Address
-  str r1,[r0,V3D_CT0CA]
-  imm32 r1,CONTROL_LIST_BIN_END ; Store Control List Executor Binning Thread 0 End Address
-  str r1,[r0,V3D_CT0EA] ; When End Address Is Stored Control List Thread Executes
-
-  WaitBinControlList: ; Wait For Control List To Execute
-    ldr r1,[r0,V3D_CT0CS]
-    tst r1,$20
-    bne WaitBinControlList
-
-  imm32 r1,CONTROL_LIST_RENDER_STRUCT ; Store Control List Executor Rendering Thread 1 Current Address
-  str r1,[r0,V3D_CT1CA]
-  imm32 r1,CONTROL_LIST_RENDER_END ; Store Control List Executor Rendering Thread 1 End Address
-  str r1,[r0,V3D_CT1EA] ; When End Address Is Stored Control List Thread Executes
   b Loop
 
 align 16
@@ -122,6 +125,9 @@ CONTROL_LIST_RENDER_STRUCT: ; Control List Of Concatenated Control Records & Dat
 
   TILE_MODE_ADDRESS:
     Tile_Rendering_Mode_Configuration $00000000, SCREEN_X, SCREEN_Y, Frame_Buffer_Color_Format_RGBA8888 ; Tile Rendering Mode Configuration (R) (Address, Width, Height, Data)
+
+  Tile_Coordinates 0, 0 ; Tile Coordinates (R) (Tile Column, Tile Row)
+  Store_Tile_Buffer_General 0, 0, 0 ; Store Tile Buffer General (R)
 
   ; Tile Row 0
   Tile_Coordinates 0, 0 ; Tile Coordinates (R) (Tile Column, Tile Row)
@@ -454,7 +460,7 @@ CONTROL_LIST_RENDER_END:
 
 align 16 ; 128-Bit Align
 NV_SHADER_STATE_RECORD: ; NV Shader State Record
-  db 1 ; Flag Bits: 0 = Fragment Shader Is Single Threaded, 1 = Point Size Included In Shaded Vertex Data, 2 = Enable Clipping, 3 = Clip Coordinates Header Included In Shaded Vertex Data
+  db 0 ; Flag Bits: 0 = Fragment Shader Is Single Threaded, 1 = Point Size Included In Shaded Vertex Data, 2 = Enable Clipping, 3 = Clip Coordinates Header Included In Shaded Vertex Data
   db 6 * 4 ; Shaded Vertex Data Stride
   db 0 ; Fragment Shader Number Of Uniforms (Not Used Currently)
   db 3 ; Fragment Shader Number Of Varyings
