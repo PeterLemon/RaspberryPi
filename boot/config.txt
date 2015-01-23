@@ -1,6 +1,7 @@
 disable_overscan=1
 disable_pvt=1
 force_turbo=1
+framebuffer_swap=0
 gpu_mem_256=160
 gpu_mem_512=316
 cma_lwm=16
