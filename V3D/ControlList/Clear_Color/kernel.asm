@@ -16,10 +16,6 @@ BITS_PER_PIXEL = 32
 
 org BUS_ADDRESSES_l2CACHE_ENABLED + $8000
 
-imm32 r0,PERIPHERAL_BASE + DMA_ENABLE ; Set DMA Channel 0 Enable Bit
-mov r1,DMA_EN0
-str r1,[r0]
-
 ; Run Tags To Initialize V3D
 imm32 r0,PERIPHERAL_BASE + MAIL_BASE
 imm32 r1,TAGS_STRUCT
@@ -51,6 +47,7 @@ strb r0,[r1],1
 lsr r0,8
 strb r0,[r1],1
 
+; Run Rendering Control List (Thread 1)
 imm32 r0,PERIPHERAL_BASE + V3D_BASE ; Load V3D Base Address
 imm32 r1,CONTROL_LIST_RENDER_STRUCT ; Store Control List Executor Rendering Thread 1 Current Address
 str r1,[r0,V3D_CT1CA]
@@ -101,10 +98,10 @@ CONTROL_LIST_RENDER_STRUCT: ; Control List Of Concatenated Control Records & Dat
   TILE_MODE_ADDRESS:
     Tile_Rendering_Mode_Configuration $00000000, SCREEN_X, SCREEN_Y, Frame_Buffer_Color_Format_RGBA8888 ; Tile Rendering Mode Configuration (R) (Address, Width, Height, Data)
 
-  ; Tile Row 0
-  Tile_Coordinates 0, 0 ; Tile Coordinates (R) (Tile Column, Tile Row) ; 1st Tile Is Garbage
-  Store_Multi_Sample ; Store Multi-Sample (Resolved Tile Color Buffer) (R)
+  Tile_Coordinates 0, 0 ; Tile Coordinates (R) (Tile Column, Tile Row)
+  Store_Tile_Buffer_General 0, 0, 0 ; Store Tile Buffer General (R)
 
+  ; Tile Row 0
   Tile_Coordinates 0, 0 ; Tile Coordinates (R) (Tile Column, Tile Row)
   Store_Multi_Sample ; Store Multi-Sample (Resolved Tile Color Buffer) (R)
 
