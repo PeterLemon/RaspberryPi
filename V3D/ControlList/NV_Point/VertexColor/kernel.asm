@@ -1,4 +1,4 @@
-; Raspberry Pi 'Bare Metal' V3D Vertex Color NV Line Control List Demo by krom (Peter Lemon):
+; Raspberry Pi 'Bare Metal' V3D Vertex Color NV Point Control List Demo by krom (Peter Lemon):
 ; 1. Run Tags & Set V3D Frequency To 250MHz, & Enable Quad Processing Unit
 ; 2. Setup Frame Buffer
 ; 3. Setup & Run V3D Control List Rendered Tile Buffer
@@ -115,7 +115,7 @@ CONTROL_LIST_BIN_STRUCT: ; Control List Of Concatenated Control Records & Data S
   Configuration_Bits Enable_Forward_Facing_Primitive + Enable_Reverse_Facing_Primitive, Early_Z_Updates_Enable ; Configuration Bits
   Viewport_Offset 0, 0 ; Viewport Offset
   NV_Shader_State NV_SHADER_STATE_RECORD ; NV Shader State (No Vertex Shading)
-  Indexed_Primitive_List Mode_Lines + Index_Type_8, 2, VERTEX_LIST, 1 ; Indexed Primitive List (OpenGL)
+  Indexed_Primitive_List Mode_Points + Index_Type_8, 2, VERTEX_LIST, 1 ; Indexed Primitive List (OpenGL)
   Flush ; Flush (Add Return-From-Sub-List To Tile Lists & Then Flush Tile Lists To Memory) (B)
 CONTROL_LIST_BIN_END:
 
@@ -460,8 +460,8 @@ CONTROL_LIST_RENDER_END:
 
 align 16 ; 128-Bit Align
 NV_SHADER_STATE_RECORD: ; NV Shader State Record
-  db 0 ; Flag Bits: 0 = Fragment Shader Is Single Threaded, 1 = Point Size Included In Shaded Vertex Data, 2 = Enable Clipping, 3 = Clip Coordinates Header Included In Shaded Vertex Data
-  db 6 * 4 ; Shaded Vertex Data Stride
+  db 2 ; Flag Bits: 0 = Fragment Shader Is Single Threaded, 1 = Point Size Included In Shaded Vertex Data, 2 = Enable Clipping, 3 = Clip Coordinates Header Included In Shaded Vertex Data
+  db 7 * 4 ; Shaded Vertex Data Stride
   db 0 ; Fragment Shader Number Of Uniforms (Not Used Currently)
   db 3 ; Fragment Shader Number Of Varyings
   dw FRAGMENT_SHADER_CODE ; Fragment Shader Code Address
@@ -480,6 +480,7 @@ VERTEX_DATA: ; Vertex List
   dh 32 * 16 ; Y In 12.4 Fixed Point
   dw 1.0 ; Z
   dw 1.0 ; 1 / W
+  dw 20.0 ; Point Size
   dw 1.0 ; Varying 0 (Red)
   dw 0.0 ; Varying 1 (Green)
   dw 0.0 ; Varying 2 (Blue)
@@ -489,6 +490,7 @@ VERTEX_DATA: ; Vertex List
   dh 448 * 16 ; Y In 12.4 Fixed Point
   dw 1.0 ; Z
   dw 1.0 ; 1 / W
+  dw 40.0 ; Point Size
   dw 0.0 ; Varying 0 (Red)
   dw 1.0 ; Varying 1 (Green)
   dw 0.0 ; Varying 2 (Blue)

@@ -470,9 +470,8 @@ NV_SHADER_STATE_RECORD: ; NV Shader State Record
 
 align 16 ; 128-Bit Align
 VERTEX_LIST: ; Vertex List
-  db 0 ; Top
-  db 1 ; Bottom Left
-  db 2 ; Bottom Right
+  db 0 ; Top Left
+  db 1 ; Bottom Right
 
 align 16 ; 128-Bit Align
 VERTEX_DATA: ; Vertex List
