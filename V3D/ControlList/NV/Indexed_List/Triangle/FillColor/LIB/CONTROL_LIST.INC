@@ -339,7 +339,7 @@ macro Line_Width width { ; Control ID Code: Line Width
 
 ; RHT_X_Boundary: RHT X Boundary Control ID Code Data Record Description
 RHT_Primitive_X_Boundary = $FFFF ; RHT_X_Boundary: RHT Primitive X Boundary (SINT16)
-macro Line_Width boundary { ; Control ID Code: RHT X Boundary 
+macro RHT_X_Boundary boundary { ; Control ID Code: RHT X Boundary 
   db $64 ; Control ID Code Byte: ID Code #100
   dh boundary ; Control ID Data Record Short: RHT Primitive X Boundary (SINT16) (Bit 0..15)
 }
