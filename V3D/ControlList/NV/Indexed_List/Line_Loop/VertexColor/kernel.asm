@@ -111,6 +111,7 @@ CONTROL_LIST_BIN_STRUCT: ; Control List Of Concatenated Control Records & Data S
   Tile_Binning_Mode_Configuration BIN_ADDRESS, $2000, BIN_BASE, 10, 8, Auto_Initialise_Tile_State_Data_Array ; Tile Binning Mode Configuration (B) (Address, Size, Base Address, Tile Width, Tile Height, Data)
   Start_Tile_Binning ; Start Tile Binning (Advances State Counter So That Initial State Items Actually Go Into Tile Lists) (B)
 
+  Line_Width 20.0 ; Line Width
   Clip_Window 0, 0, SCREEN_X, SCREEN_Y ; Clip Window
   Configuration_Bits Enable_Forward_Facing_Primitive + Enable_Reverse_Facing_Primitive, Early_Z_Updates_Enable ; Configuration Bits
   Viewport_Offset 0, 0 ; Viewport Offset
