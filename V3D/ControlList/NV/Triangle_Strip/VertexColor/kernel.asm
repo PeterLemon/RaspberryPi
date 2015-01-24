@@ -459,7 +459,7 @@ CONTROL_LIST_RENDER_STRUCT: ; Control List Of Concatenated Control Records & Dat
 CONTROL_LIST_RENDER_END:
 
 align 16 ; 128-Bit Align
-NV_SHADER_STATE_RECORD: ; NV Shader State Record
+NV_SHADER_STATE_RECORD:
   db 0 ; Flag Bits: 0 = Fragment Shader Is Single Threaded, 1 = Point Size Included In Shaded Vertex Data, 2 = Enable Clipping, 3 = Clip Coordinates Header Included In Shaded Vertex Data
   db 6 * 4 ; Shaded Vertex Data Stride
   db 0 ; Fragment Shader Number Of Uniforms (Not Used Currently)
@@ -469,14 +469,14 @@ NV_SHADER_STATE_RECORD: ; NV Shader State Record
   dw VERTEX_DATA ; Shaded Vertex Data Address (128-Bit Aligned If Including Clip Coordinate Header)
 
 align 16 ; 128-Bit Align
-VERTEX_LIST: ; Vertex List
+VERTEX_LIST:
   db 0 ; Top Left
   db 1 ; Bottom Left
   db 2 ; Top Right
   db 3 ; Bottom Right
 
 align 16 ; 128-Bit Align
-VERTEX_DATA: ; Vertex List
+VERTEX_DATA:
   ; Vertex: Top Left, Red
   dh 32 * 16 ; X In 12.4 Fixed Point
   dh 32 * 16 ; Y In 12.4 Fixed Point
