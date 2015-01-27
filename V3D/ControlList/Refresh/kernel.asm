@@ -1,4 +1,4 @@
-; Raspberry Pi 'Bare Metal' V3D Multi Sample Vertex Color NV Vertex Array Triangle Control List Demo by krom (Peter Lemon):
+; Raspberry Pi 'Bare Metal' V3D Refresh Multi Sample Vertex Color NV Vertex Array Triangle Control List Demo by krom (Peter Lemon):
 ; 1. Run Tags & Set V3D Frequency To 250MHz, & Enable Quad Processing Unit
 ; 2. Setup Frame Buffer
 ; 3. Setup & Run V3D Control List Rendered Tile Buffer
@@ -51,26 +51,53 @@ strb r0,[r1],1
 lsr r0,8
 strb r0,[r1],1
 
-; Run Binning Control List (Thread 0)
-imm32 r0,PERIPHERAL_BASE + V3D_BASE ; Load V3D Base Address
-imm32 r1,CONTROL_LIST_BIN_STRUCT ; Store Control List Executor Binning Thread 0 Current Address
-str r1,[r0,V3D_CT0CA]
-imm32 r1,CONTROL_LIST_BIN_END ; Store Control List Executor Binning Thread 0 End Address
-str r1,[r0,V3D_CT0EA] ; When End Address Is Stored Control List Thread Executes
+Refresh:
+  ; Run Binning Control List (Thread 0)
+  imm32 r0,PERIPHERAL_BASE + V3D_BASE ; Load V3D Base Address
+  imm32 r1,CONTROL_LIST_BIN_STRUCT ; Store Control List Executor Binning Thread 0 Current Address
+  str r1,[r0,V3D_CT0CA]
+  imm32 r1,CONTROL_LIST_BIN_END ; Store Control List Executor Binning Thread 0 End Address
+  str r1,[r0,V3D_CT0EA] ; When End Address Is Stored Control List Thread Executes
 
-WaitBinControlList: ; Wait For Control List To Execute
-  ldr r1,[r0,V3D_BFC] ; Load Flush Count
-  tst r1,1 ; Test IF PTB Has Flushed All Tile Lists To Memory
-  beq WaitBinControlList
+  WaitBinControlList: ; Wait For Control List To Execute
+    ldr r1,[r0,V3D_BFC] ; Load Flush Count
+    tst r1,1 ; Test IF PTB Has Flushed All Tile Lists To Memory
+    beq WaitBinControlList
+  mov r1,1
+  str r1,[r0,V3D_BFC] ; Reset Flush Count
 
-; Run Rendering Control List (Thread 1)
-imm32 r1,CONTROL_LIST_RENDER_STRUCT ; Store Control List Executor Rendering Thread 1 Current Address
-str r1,[r0,V3D_CT1CA]
-imm32 r1,CONTROL_LIST_RENDER_END ; Store Control List Executor Rendering Thread 1 End Address
-str r1,[r0,V3D_CT1EA] ; When End Address Is Stored Control List Thread Executes
+  ; Run Rendering Control List (Thread 1)
+  imm32 r1,CONTROL_LIST_RENDER_STRUCT ; Store Control List Executor Rendering Thread 1 Current Address
+  str r1,[r0,V3D_CT1CA]
+  imm32 r1,CONTROL_LIST_RENDER_END ; Store Control List Executor Rendering Thread 1 End Address
+  str r1,[r0,V3D_CT1EA] ; When End Address Is Stored Control List Thread Executes
 
-Loop:
-  b Loop
+  WaitRenderControlList: ; Wait For Control List To Execute
+    ldr r1,[r0,V3D_RFC] ; Load Frame Count
+    tst r1,1 ; Test IF Last Tile Store Operation Of The Frame Is Complete
+    beq WaitRenderControlList
+  mov r1,1
+  str r1,[r0,V3D_RFC] ; Reset Frame Count
+
+  ; Translate Primitive X
+  imm32 r0,VERTEX_DATA
+  ldrh r1,[r0] ; Vertex 0
+  cmp r1,160 * 16
+  moveq r2,1 ; Translation X Direction Increment
+  add r1,r2
+  strh r1,[r0],6 * 4
+
+  ldrh r1,[r0] ; Vertex 1
+  add r1,r2
+  strh r1,[r0],6 * 4
+
+  ldrh r1,[r0] ; Vertex 2
+  cmp r1,608 * 16
+  mvneq r2,0 ; Translation X Direction Decrement
+  add r1,r2
+  strh r1,[r0]
+
+b Refresh
 
 align 16
 FB_STRUCT: ; Frame Buffer Structure
@@ -164,8 +191,8 @@ NV_SHADER_STATE_RECORD:
 align 16 ; 128-Bit Align
 VERTEX_DATA:
   ; Vertex: Top, Red
-  dh 320 * 16 ; X In 12.4 Fixed Point
-  dh  32 * 16 ; Y In 12.4 Fixed Point
+  dh 160 * 16 ; X In 12.4 Fixed Point
+  dh 152 * 16 ; Y In 12.4 Fixed Point
   dw 1.0 ; Z
   dw 1.0 ; 1 / W
   dw 1.0 ; Varying 0 (Red)
@@ -174,7 +201,7 @@ VERTEX_DATA:
 
   ; Vertex: Bottom Left, Green
   dh  32 * 16 ; X In 12.4 Fixed Point
-  dh 448 * 16 ; Y In 12.4 Fixed Point
+  dh 328 * 16 ; Y In 12.4 Fixed Point
   dw 1.0 ; Z
   dw 1.0 ; 1 / W
   dw 0.0 ; Varying 0 (Red)
@@ -182,8 +209,8 @@ VERTEX_DATA:
   dw 0.0 ; Varying 2 (Blue)
 
   ; Vertex: Bottom Right, Blue
-  dh 608 * 16 ; X In 12.4 Fixed Point
-  dh 448 * 16 ; Y In 12.4 Fixed Point
+  dh 288 * 16 ; X In 12.4 Fixed Point
+  dh 328 * 16 ; Y In 12.4 Fixed Point
   dw 1.0 ; Z
   dw 1.0 ; 1 / W
   dw 0.0 ; Varying 0 (Red)
