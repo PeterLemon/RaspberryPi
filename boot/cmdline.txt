@@ -1,1 +1,0 @@
-coherent_pool=2M cma=2M smsc95xx.turbo_mode=Y
