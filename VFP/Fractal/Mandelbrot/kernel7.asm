@@ -1,8 +1,7 @@
 ; Raspberry Pi 2 'Bare Metal' Mandelbrot Fractal Demo by krom (Peter Lemon):
-; 1. Turn On L1 Cache
-; 2. Turn On Vector Floating Point Unit
-; 3. Setup Frame Buffer
-; 4. Plot Fractal Using Double-Precision
+; 1. Turn On Vector Floating Point Unit
+; 2. Setup Frame Buffer
+; 3. Plot Fractal Using Double-Precision
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
