@@ -9,7 +9,7 @@ format binary as 'img'
 include 'LIB\FASMARM.INC'
 include 'LIB\R_PI.INC'
 
-org BUS_ADDRESSES_l2CACHE_ENABLED + $8000
+org $8000
 
 ; Convert Sample
 imm32 r0,SND_Sample
@@ -52,7 +52,7 @@ imm32 r0,PERIPHERAL_BASE + DMA_ENABLE
 mov r1,DMA_EN0
 str r1,[r0]
 
-; Set Control Block Data Address Into DMA Channel 0 Controller
+; Set Control Block Data Address To DMA Channel 0 Controller
 imm32 r0,PERIPHERAL_BASE + DMA0_BASE
 imm32 r1,CB_STRUCT
 str r1,[r0,DMA_CONBLK_AD]
