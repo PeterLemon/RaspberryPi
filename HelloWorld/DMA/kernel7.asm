@@ -1,10 +1,10 @@
-; Raspberry Pi 'Bare Metal' 8BPP Hello World Demo by krom (Peter Lemon):
+; Raspberry Pi 2 'Bare Metal' Hello World DMA Demo by krom (Peter Lemon):
 ; 1. Setup Frame Buffer
-; 2. Copy Hello World Text Characters To Frame Buffer Using CPU
+; 2. Copy Hello World Text Characters To Frame Buffer Using DMA 2D Mode & Stride
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
@@ -16,6 +16,10 @@ CHAR_X = 8
 CHAR_Y = 8
 
 org $8000
+
+imm32 r0,PERIPHERAL_BASE + DMA_ENABLE ; Set DMA Channel 0 Enable Bit
+mov r1,DMA_EN0
+str r1,[r0]
 
 FB_Init:
   imm32 r0,FB_STRUCT + MAIL_TAGS
@@ -32,24 +36,24 @@ add r0,r1 ; Place Text At XY Position 256,32
 
 adr r1,Font ; R1 = Characters
 adr r2,Text ; R2 = Text Offset
-mov r3,12 ; R3 = Number Of Text Characters To Print
+adr r3,CB_STRUCT ; R3 = Control Block Data
+imm32 r4,PERIPHERAL_BASE + DMA0_BASE ; R4 = DMA 0 Base
+mov r5,DMA_ACTIVE ; R5 = DMA Active Bit
+mov r6,12 ; R6 = Number Of Text Characters To Print
 DrawChars:
-  mov r4,CHAR_Y ; R4 = Character Row Counter
-  ldrb r5,[r2],1 ; R5 = Next Text Character
-  add r5,r1,r5,lsl 6 ; Add Shift To Correct Position In Font (* 64)
+  ldrb r7,[r2],1 ; R7 = Next Text Character
+  add r7,r1,r7,lsl 6 ; Add Shift To Correct Position In Font (* 64)
+  str r7,[CB_SOURCE] ; Store DMA Source Address
+  str r0,[CB_DEST] ; Store DMA Destination Address
+  str r3,[r4,DMA_CONBLK_AD] ; Store DMA Control Block Data Address
 
-  DrawChar:
-    ldr r6,[r5],4 ; Load Font Text Character 1/2 Row
-    str r6,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
-    ldr r6,[r5],4 ; Load Font Text Character 1/2 Row
-    str r6,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
-    add r0,SCREEN_X ; Jump Down 1 Scanline
-    sub r0,CHAR_X ; Jump Back 1 Char
-    subs r4,1 ; Decrement Character Row Counter
-    bne DrawChar ; IF (Character Row Counter != 0) DrawChar
+  str r5,[r4,DMA_CS] ; Print Next Text Character To Screen
+  DMAWait:
+    ldr r7,[r4,DMA_CS] ; Load Control Block Status
+    tst r7,r5 ; Test Active Bit
+    bne DMAWait ; Wait Until DMA Has Finished
 
-  subs r3,1 ; Subtract Number Of Text Characters To Print
-  subne r0,SCREEN_X * CHAR_Y ; Jump To Top Of Char
+  subs r6,1 ; Subtract Number Of Text Characters To Print
   addne r0,CHAR_X ; Jump Forward 1 Char
   bne DrawChars ; IF (Number Of Text Characters != 0) Continue To Print Characters
 
@@ -104,6 +108,17 @@ FB_POINTER:
 
 dw $00000000 ; $0 (End Tag)
 FB_STRUCT_END:
+
+align 32
+CB_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+CB_SOURCE:
+  dw 0 ; DMA Source Address
+CB_DEST:
+  dw 0 ; DMA Destination Address
+  dw CHAR_X + ((CHAR_Y - 1) * 65536) ; DMA Transfer Length
+  dw (SCREEN_X - CHAR_X) * 65536 ; DMA 2D Mode Stride
+  dw 0 ; DMA Next Control Block Address
 
 Text:
   db "Hello World!"

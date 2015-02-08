@@ -15,31 +15,24 @@ BITS_PER_PIXEL = 8
 CHAR_X = 8
 CHAR_Y = 8
 
-org BUS_ADDRESSES_l2CACHE_ENABLED + $8000
+org $8000
 
 imm32 r0,PERIPHERAL_BASE + DMA_ENABLE ; Set DMA Channel 0 Enable Bit
 mov r1,DMA_EN0
 str r1,[r0]
 
 FB_Init:
-  imm32 r0,PERIPHERAL_BASE + MAIL_BASE
-  imm32 r1,FB_STRUCT
-  orr r1,MAIL_FB
-  str r1,[r0,MAIL_WRITE] ; Mail Box Write
+  imm32 r0,FB_STRUCT + MAIL_TAGS
+  imm32 r1,PERIPHERAL_BASE + MAIL_BASE + MAIL_WRITE + MAIL_TAGS
+  str r0,[r1] ; Mail Box Write
 
-  FB_Read:
-    ldr r1,[r0,MAIL_READ]
-    tst r1,MAIL_FB ; Test Frame Buffer Channel 1
-    beq FB_Read ; Wait For Frame Buffer Channel 1 Data
-
-  imm32 r1,FB_POINTER
-  ldr r0,[r1] ; R0 = Frame Buffer Pointer
+  ldr r0,[FB_POINTER] ; R0 = Frame Buffer Pointer
   cmp r0,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
 ; Draw Characters
-imm32 r1,259 + (SCREEN_X * 51)
-add r0,r1 ; Place Text At XY Position 259,51
+imm32 r1,256 + (SCREEN_X * 32)
+add r0,r1 ; Place Text At XY Position 256,32
 
 adr r1,Font ; R1 = Characters
 adr r2,Text ; R2 = Text Offset
@@ -62,41 +55,59 @@ DrawChars:
 
   subs r6,1 ; Subtract Number Of Text Characters To Print
   addne r0,CHAR_X ; Jump Forward 1 Char
-  bne DrawChars ; Continue To Print Characters
+  bne DrawChars ; IF (Number Of Text Characters != 0) Continue To Print Characters
 
 Loop:
   b Loop
 
 align 16
-FB_STRUCT: ; Frame Buffer Structure
-  dw SCREEN_X ; Frame Buffer Pixel Width
-  dw SCREEN_Y ; Frame Buffer Pixel Height
-  dw SCREEN_X ; Frame Buffer Virtual Pixel Width
-  dw SCREEN_Y ; Frame Buffer Virtual Pixel Height
-  dw 0 ; Frame Buffer Pitch (Set By GPU)
-  dw BITS_PER_PIXEL ; Frame Buffer Bits Per Pixel
-  dw 0 ; Frame Buffer Offset In X Direction
-  dw 0 ; Frame Buffer Offset In Y Direction
+FB_STRUCT: ; Mailbox Property Interface Buffer Structure
+  dw FB_STRUCT_END - FB_STRUCT ; Buffer Size In Bytes (Including The Header Values, The End Tag And Padding)
+  dw $00000000 ; Buffer Request/Response Code
+	       ; Request Codes: $00000000 Process Request Response Codes: $80000000 Request Successful, $80000001 Partial Response
+; Sequence Of Concatenated Tags
+  dw Set_Physical_Display ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw SCREEN_X ; Value Buffer
+  dw SCREEN_Y ; Value Buffer
+
+  dw Set_Virtual_Buffer ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw SCREEN_X ; Value Buffer
+  dw SCREEN_Y ; Value Buffer
+
+  dw Set_Depth ; Tag Identifier
+  dw $00000004 ; Value Buffer Size In Bytes
+  dw $00000004 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw BITS_PER_PIXEL ; Value Buffer
+
+  dw Set_Virtual_Offset ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+FB_OFFSET_X:
+  dw 0 ; Value Buffer
+FB_OFFSET_Y:
+  dw 0 ; Value Buffer
+
+  dw Set_Palette ; Tag Identifier
+  dw $00000010 ; Value Buffer Size In Bytes
+  dw $00000010 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw 0 ; Value Buffer (Offset: First Palette Index To Set (0-255))
+  dw 2 ; Value Buffer (Length: Number Of Palette Entries To Set (1-256))
+FB_PAL:
+  dw $00000000,$FFFFFFFF ; RGBA Palette Values (Offset To Offset+Length-1)
+
+  dw Allocate_Buffer ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
 FB_POINTER:
-  dw 0 ; Frame Buffer Pointer (Set By GPU)
-  dw 0 ; Frame Buffer Size (Set By GPU)
-FB_PAL: ; Frame Buffer Palette
-  dh $0000,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
+  dw 0 ; Value Buffer
+  dw 0 ; Value Buffer
+
+dw $00000000 ; $0 (End Tag)
+FB_STRUCT_END:
 
 align 32
 CB_STRUCT: ; Control Block Data Structure

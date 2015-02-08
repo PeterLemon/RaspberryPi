@@ -1,10 +1,10 @@
-; Raspberry Pi 'Bare Metal' 8BPP Hello World Demo by krom (Peter Lemon):
+; Raspberry Pi 2 'Bare Metal' 8BPP Hello World Demo by krom (Peter Lemon):
 ; 1. Setup Frame Buffer
 ; 2. Copy Hello World Text Characters To Frame Buffer Using CPU
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
