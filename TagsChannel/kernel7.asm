@@ -1,4 +1,4 @@
-; Raspberry Pi 'Bare Metal' Multiple Tags Demo by krom (Peter Lemon):
+; Raspberry Pi 2 'Bare Metal' Multiple Tags Demo by krom (Peter Lemon):
 ; 1. Run Tags & Populate Values
 ; 2. Setup Frame Buffer
 ; 3. Copy Tags Value HEX Characters To Frame Buffer Using DMA 2D Mode & Stride
@@ -121,7 +121,7 @@ macro PrintTAGValueBE Text, TextLength, Value, ValueLength {
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
