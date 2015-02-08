@@ -1,9 +1,9 @@
-; Raspberry Pi 'Bare Metal' LZ77 Decode Demo by krom (Peter Lemon):
+; Raspberry Pi 2 'Bare Metal' LZ77 Decode Demo by krom (Peter Lemon):
 ; 1. Decode LZ77 Chunks To Memory
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 org $8000
 

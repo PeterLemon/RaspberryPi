@@ -1,9 +1,9 @@
-; Raspberry Pi 'Bare Metal' HUFFMAN Decode Demo by krom (Peter Lemon) & Andy Smith:
+; Raspberry Pi 2 'Bare Metal' HUFFMAN Decode Demo by krom (Peter Lemon) & Andy Smith:
 ; 1. Decode HUFFMAN Chunks To Memory
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 org $8000
 

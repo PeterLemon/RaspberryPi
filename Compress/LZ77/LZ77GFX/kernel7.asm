@@ -1,10 +1,10 @@
-; Raspberry Pi 'Bare Metal' LZ77 GFX Demo by krom (Peter Lemon):
+; Raspberry Pi 2 'Bare Metal' LZ77 GFX Demo by krom (Peter Lemon):
 ; 1. Setup Frame Buffer
 ; 2. Decode LZ77 Chunks To Video Memory
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
