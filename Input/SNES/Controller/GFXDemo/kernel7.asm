@@ -1,4 +1,4 @@
-; Raspberry Pi 'Bare Metal' Input SNES Controller GFX Demo by krom (Peter Lemon):
+; Raspberry Pi 2 'Bare Metal' Input SNES Controller GFX Demo by krom (Peter Lemon):
 ; 1. Setup Frame Buffer
 ; 2. Start DMA 0 To Loop DMA Control Blocks For Fast Screen Buffer
 ; 3. Initialize & Update Input Data
@@ -14,7 +14,7 @@ macro Delay amount {
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 ; Setup Input
 JOY_R      = 0000000000010000b

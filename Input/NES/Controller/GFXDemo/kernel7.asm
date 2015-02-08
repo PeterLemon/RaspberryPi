@@ -1,4 +1,4 @@
-; Raspberry Pi 'Bare Metal' Input SNES Controller GFX Demo by krom (Peter Lemon):
+; Raspberry Pi 2 'Bare Metal' Input NES Controller GFX Demo by krom (Peter Lemon):
 ; 1. Setup Frame Buffer
 ; 2. Start DMA 0 To Loop DMA Control Blocks For Fast Screen Buffer
 ; 3. Initialize & Update Input Data
@@ -14,21 +14,17 @@ macro Delay amount {
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 ; Setup Input
-JOY_R      = 0000000000010000b
-JOY_L      = 0000000000100000b
-JOY_X      = 0000000001000000b
-JOY_A      = 0000000010000000b
-JOY_RIGHT  = 0000000100000000b
-JOY_LEFT   = 0000001000000000b
-JOY_DOWN   = 0000010000000000b
-JOY_UP     = 0000100000000000b
-JOY_START  = 0001000000000000b
-JOY_SELECT = 0010000000000000b
-JOY_Y      = 0100000000000000b
-JOY_B      = 1000000000000000b
+JOY_RIGHT  = 00000001b
+JOY_LEFT   = 00000010b
+JOY_DOWN   = 00000100b
+JOY_UP     = 00001000b
+JOY_START  = 00010000b
+JOY_SELECT = 00100000b
+JOY_B      = 01000000b
+JOY_A      = 10000000b
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
@@ -84,8 +80,8 @@ UpdateInput:
   str r1,[r0,GPIO_GPCLR0]
   Delay 32
 
-  mov r1,0  ; R1 = Input Data
-  mov r2,15 ; R2 = Input Data Count
+  mov r1,0 ; R1 = Input Data
+  mov r2,7 ; R2 = Input Data Count
   LoopInputData:
     ldr r3,[r0,GPIO_GPLEV0] ; Get GPIO 4 (Data) Level
     tst r3,GPIO_4
@@ -101,26 +97,11 @@ UpdateInput:
     Delay 32
 
     subs r2,1
-    bge LoopInputData ; Loop 16bit Data
+    bge LoopInputData ; Loop 8bit Data
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; R1 Now Contains Input Data ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-tst r1,JOY_L
-imm32ne r0,ButtonLPress
-imm32eq r0,ButtonL
-str r0,[ButtonL_SOURCE]
-
-tst r1,JOY_R
-imm32ne r0,ButtonRPress
-imm32eq r0,ButtonR
-str r0,[ButtonR_SOURCE]
-
-tst r1,JOY_X
-imm32ne r0,ButtonXPress
-imm32eq r0,ButtonX
-str r0,[ButtonX_SOURCE]
 
 tst r1,JOY_A
 imm32ne r0,ButtonAPress
@@ -131,11 +112,6 @@ tst r1,JOY_B
 imm32ne r0,ButtonBPress
 imm32eq r0,ButtonB
 str r0,[ButtonB_SOURCE]
-
-tst r1,JOY_Y
-imm32ne r0,ButtonYPress
-imm32eq r0,ButtonY
-str r0,[ButtonY_SOURCE]
 
 tst r1,JOY_START
 imm32ne r0,ButtonStartPress
@@ -210,36 +186,6 @@ BG_DEST:
   dw Screen_Buffer ; DMA Destination Address
   dw SCREEN_X * SCREEN_Y * (BITS_PER_PIXEL / 8) ; DMA Transfer Length
   dw 0 ; DMA 2D Mode Stride
-  dw ButtonL_STRUCT ; DMA Next Control Block Address
-
-align 32
-ButtonL_STRUCT: ; Control Block Data Structure
-  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
-ButtonL_SOURCE:
-  dw ButtonL ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 192) + 80) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (144 * (BITS_PER_PIXEL / 8)) + ((40 - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (144 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
-  dw ButtonR_STRUCT ; DMA Next Control Block Address
-
-align 32
-ButtonR_STRUCT: ; Control Block Data Structure
-  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
-ButtonR_SOURCE:
-  dw ButtonR ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 192) + 416) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (144 * (BITS_PER_PIXEL / 8)) + ((40 - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (144 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
-  dw ButtonX_STRUCT ; DMA Next Control Block Address
-
-align 32
-ButtonX_STRUCT: ; Control Block Data Structure
-  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
-ButtonX_SOURCE:
-  dw ButtonX ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 264) + 464) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (64 * (BITS_PER_PIXEL / 8)) + ((56 - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw ButtonA_STRUCT ; DMA Next Control Block Address
 
 align 32
@@ -247,9 +193,9 @@ ButtonA_STRUCT: ; Control Block Data Structure
   dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
 ButtonA_SOURCE:
   dw ButtonA ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 308) + 524) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (64 * (BITS_PER_PIXEL / 8)) + ((56 - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw Screen_Buffer + (((SCREEN_X * 360) + 490) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (72 * (BITS_PER_PIXEL / 8)) + ((72 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (72 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw ButtonB_STRUCT ; DMA Next Control Block Address
 
 align 32
@@ -257,19 +203,9 @@ ButtonB_STRUCT: ; Control Block Data Structure
   dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
 ButtonB_SOURCE:
   dw ButtonB ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 352) + 464) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (64 * (BITS_PER_PIXEL / 8)) + ((56 - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
-  dw ButtonY_STRUCT ; DMA Next Control Block Address
-
-align 32
-ButtonY_STRUCT: ; Control Block Data Structure
-  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
-ButtonY_SOURCE:
-  dw ButtonY ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 308) + 404) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (64 * (BITS_PER_PIXEL / 8)) + ((56 - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw Screen_Buffer + (((SCREEN_X * 360) + 408) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (72 * (BITS_PER_PIXEL / 8)) + ((72 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (72 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw ButtonStart_STRUCT ; DMA Next Control Block Address
 
 align 32
@@ -277,9 +213,9 @@ ButtonStart_STRUCT: ; Control Block Data Structure
   dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
 ButtonStart_SOURCE:
   dw ButtonStart ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 328) + 300) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (60 * (BITS_PER_PIXEL / 8)) + ((52 - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (60 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw Screen_Buffer + (((SCREEN_X * 380) + 304) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (64 * (BITS_PER_PIXEL / 8)) + ((32 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw ButtonSelect_STRUCT ; DMA Next Control Block Address
 
 align 32
@@ -287,9 +223,9 @@ ButtonSelect_STRUCT: ; Control Block Data Structure
   dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
 ButtonSelect_SOURCE:
   dw ButtonSelect ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 328) + 236) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (60 * (BITS_PER_PIXEL / 8)) + ((52 - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (60 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw Screen_Buffer + (((SCREEN_X * 380) + 224) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (64 * (BITS_PER_PIXEL / 8)) + ((32 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw Direction_STRUCT ; DMA Next Control Block Address
 
 align 32
@@ -297,7 +233,7 @@ Direction_STRUCT: ; Control Block Data Structure
   dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
 Direction_SOURCE:
   dw Direction ; DMA Source Address
-  dw Screen_Buffer + (((SCREEN_X * 272) + 76) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw Screen_Buffer + (((SCREEN_X * 300) + 56) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
   dw (128 * (BITS_PER_PIXEL / 8)) + ((128 - 1) * 65536) ; DMA Transfer Length
   dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (128 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw SCRBUF_STRUCT ; DMA Next Control Block Address
@@ -312,21 +248,6 @@ SCRBUF_DEST:
   dw 0 ; DMA 2D Mode Stride
   dw BG_STRUCT ; DMA Next Control Block Address
 
-ButtonL:
-  file 'ButtonL.bin'
-ButtonLPress:
-  file 'ButtonLPress.bin'
-
-ButtonR:
-  file 'ButtonR.bin'
-ButtonRPress:
-  file 'ButtonRPress.bin'
-
-ButtonX:
-  file 'ButtonX.bin'
-ButtonXPress:
-  file 'ButtonXPress.bin'
-
 ButtonA:
   file 'ButtonA.bin'
 ButtonAPress:
@@ -336,11 +257,6 @@ ButtonB:
   file 'ButtonB.bin'
 ButtonBPress:
   file 'ButtonBPress.bin'
-
-ButtonY:
-  file 'ButtonY.bin'
-ButtonYPress:
-  file 'ButtonYPress.bin'
 
 ButtonStart:
   file 'ButtonStart.bin'
