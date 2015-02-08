@@ -1,7 +1,7 @@
 RaspberryPi
 ===========
 <br />
-Raspberry Pi Bare Metal Code by krom (Peter Lemon).<br />
+Raspberry Pi & Raspberry Pi 2 Bare Metal Code by krom (Peter Lemon).<br />
 <br />
 All code compiles out of box with the FASMARM assembler by revolution:<br />
 http://arm.flatassembler.net<br />
@@ -19,8 +19,8 @@ http://gbadev.org<br />
 http://forum.gbadev.org<br />
 <br />
 Howto Compile:<br />
-All the code compiles into a single binary (kernel.img) file.<br />
-Using FASMARM open up kernel.asm and click the Run/Compile button.<br />
+All the code compiles into a single binary (kernel.img for Raspberry Pi or kernel7.img for Raspberry Pi 2) file.<br />
+Using FASMARM open up kernel.asm for Raspberry Pi or kernel7.asm for Raspberry Pi 2 & click the Run/Compile button.<br />
 <br />
 Howto Run:<br />
 I only test with the latest bleeding edge firmware:<br />
@@ -30,23 +30,14 @@ You will need these 2 files:<br />
 bootcode.bin<br />
 start.elf<br />
 <br />
-You will need to create a "cmdline.txt" file that contains the line:<br />
-coherent_pool=2M cma=2M smsc95xx.turbo_mode=Y<br />
-<br />
 You will need to create a "config.txt" file that contains the lines:<br />
 disable_overscan=1<br />
-disable_pvt=1<br />
-force_turbo=1<br />
 framebuffer_swap=0<br />
-gpu_mem_256=160<br />
-gpu_mem_512=316<br />
-cma_lwm=16<br />
-cma_hwm=32<br />
 <br />
 Check http://www.raspberrypi.org/documentation/configuration/config-txt.md for more info about config options.<br />
-Check https://github.com/PeterLemon/RaspberryPi/tree/master/boot for .txt files.<br />
+Check https://github.com/PeterLemon/RaspberryPi/tree/master/boot for the config.txt file.<br />
 <br />
-Once you have all these files ready, you can copy them & a kernel.img file to the root of an SD card.<br />
+Once you have all these files ready, you can copy them & a kernel.img (Raspberry Pi), or a kernel7.img (Raspberry Pi 2) file to the root of an SD card.<br />
 <br />
 All of my demos use a maximum resolution of 640x480, they have been tested using composite & HDMI.<br />
 <br />
