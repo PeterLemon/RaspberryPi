@@ -1,4 +1,4 @@
-; Raspberry Pi 'Bare Metal' Mandelbrot Fractal Demo by krom (Peter Lemon):
+; Raspberry Pi 2 'Bare Metal' Mandelbrot Fractal Demo by krom (Peter Lemon):
 ; 1. Turn On L1 Cache
 ; 2. Turn On Vector Floating Point Unit
 ; 3. Setup Frame Buffer
@@ -6,7 +6,7 @@
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI.INC'
+include 'LIB\R_PI2.INC'
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
@@ -21,11 +21,10 @@ VFPDouble = $C00000
 org $8000
 
 ; Enable Vector Floating Point Calculations
-mrc p15,0,r0,c1,c0,2 ; R0 = Access Control Register
-orr r0,VFPSingle + VFPDouble ; Enable Single & Double Precision
+mov r0,VFPSingle + VFPDouble ; Enable Single & Double Precision
 mcr p15,0,r0,c1,c0,2 ; Access Control Register = R0
 mov r0,VFPEnable ; Enable VFP
-fmxr fpexc,r0 ; FPEXC = R0
+vmsr fpexc,r0 ; FPEXC = R0
 
 FB_Init:
   imm32 r0,FB_STRUCT + MAIL_TAGS
