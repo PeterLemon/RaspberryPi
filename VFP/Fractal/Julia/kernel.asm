@@ -13,18 +13,20 @@ SCREEN_X       = 640
 SCREEN_Y       = 480
 BITS_PER_PIXEL = 32
 
-; Setup VFP
-VFPEnable = $40000000
-VFPSingle = $300000
-VFPDouble = $C00000
-
 org $8000
+
+; Start L1 Cache
+mrc p15,0,r0,c1,c0,0 ; R0 = System Control Register
+orr r0,$0004 ; Data Cache (Bit 2)
+orr r0,$0800 ; Branch Prediction (Bit 11)
+orr r0,$1000 ; Instruction Caches (Bit 12)
+mcr p15,0,r0,c1,c0,0 ; System Control Register = R0
 
 ; Enable Vector Floating Point Calculations
 mrc p15,0,r0,c1,c0,2 ; R0 = Access Control Register
-orr r0,VFPSingle + VFPDouble ; Enable Single & Double Precision
+orr r0,$300000 + $C00000 ; Enable Single & Double Precision
 mcr p15,0,r0,c1,c0,2 ; Access Control Register = R0
-mov r0,VFPEnable ; Enable VFP
+mov r0,$40000000 ; R0 = Enable VFP
 fmxr fpexc,r0 ; FPEXC = R0
 
 FB_Init:
