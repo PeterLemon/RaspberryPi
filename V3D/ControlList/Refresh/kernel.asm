@@ -18,7 +18,7 @@ BITS_PER_PIXEL = 32
 BIN_ADDRESS = $00400000
 BIN_BASE    = $00500000
 
-org BUS_ADDRESSES_l2CACHE_ENABLED + $8000
+org $8000
 
 ; Run Tags To Initialize V3D
 imm32 r0,PERIPHERAL_BASE + MAIL_BASE
@@ -27,18 +27,11 @@ orr r1,MAIL_TAGS
 str r1,[r0,MAIL_WRITE] ; Mail Box Write
 
 FB_Init:
-  imm32 r0,PERIPHERAL_BASE + MAIL_BASE
-  imm32 r1,FB_STRUCT
-  orr r1,MAIL_FB
-  str r1,[r0,MAIL_WRITE] ; Mail Box Write
+  imm32 r0,FB_STRUCT + MAIL_TAGS
+  imm32 r1,PERIPHERAL_BASE + MAIL_BASE + MAIL_WRITE + MAIL_TAGS
+  str r0,[r1] ; Mail Box Write
 
-  FB_Read:
-    ldr r1,[r0,MAIL_READ]
-    tst r1,MAIL_FB ; Test Frame Buffer Channel 1
-    beq FB_Read ; Wait For Frame Buffer Channel 1 Data
-
-  imm32 r1,FB_POINTER
-  ldr r0,[r1] ; R0 = Frame Buffer Pointer
+  ldr r0,[FB_POINTER] ; R0 = Frame Buffer Pointer
   cmp r0,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
@@ -54,6 +47,10 @@ strb r0,[r1],1
 Refresh:
   ; Run Binning Control List (Thread 0)
   imm32 r0,PERIPHERAL_BASE + V3D_BASE ; Load V3D Base Address
+  mov r1,1
+  str r1,[r0,V3D_BFC] ; Reset Flush Count
+  str r1,[r0,V3D_RFC] ; Reset Frame Count
+
   imm32 r1,CONTROL_LIST_BIN_STRUCT ; Store Control List Executor Binning Thread 0 Current Address
   str r1,[r0,V3D_CT0CA]
   imm32 r1,CONTROL_LIST_BIN_END ; Store Control List Executor Binning Thread 0 End Address
@@ -63,8 +60,6 @@ Refresh:
     ldr r1,[r0,V3D_BFC] ; Load Flush Count
     tst r1,1 ; Test IF PTB Has Flushed All Tile Lists To Memory
     beq WaitBinControlList
-  mov r1,1
-  str r1,[r0,V3D_BFC] ; Reset Flush Count
 
   ; Run Rendering Control List (Thread 1)
   imm32 r1,CONTROL_LIST_RENDER_STRUCT ; Store Control List Executor Rendering Thread 1 Current Address
@@ -76,8 +71,6 @@ Refresh:
     ldr r1,[r0,V3D_RFC] ; Load Frame Count
     tst r1,1 ; Test IF Last Tile Store Operation Of The Frame Is Complete
     beq WaitRenderControlList
-  mov r1,1
-  str r1,[r0,V3D_RFC] ; Reset Frame Count
 
   ; Translate Primitive X
   imm32 r0,VERTEX_DATA
@@ -100,18 +93,45 @@ Refresh:
 b Refresh
 
 align 16
-FB_STRUCT: ; Frame Buffer Structure
-  dw SCREEN_X ; Frame Buffer Pixel Width
-  dw SCREEN_Y ; Frame Buffer Pixel Height
-  dw SCREEN_X ; Frame Buffer Virtual Pixel Width
-  dw SCREEN_Y ; Frame Buffer Virtual Pixel Height
-  dw 0 ; Frame Buffer Pitch (Set By GPU)
-  dw BITS_PER_PIXEL ; Frame Buffer Bits Per Pixel
-  dw 0 ; Frame Buffer Offset In X Direction
-  dw 0 ; Frame Buffer Offset In Y Direction
+FB_STRUCT: ; Mailbox Property Interface Buffer Structure
+  dw FB_STRUCT_END - FB_STRUCT ; Buffer Size In Bytes (Including The Header Values, The End Tag And Padding)
+  dw $00000000 ; Buffer Request/Response Code
+	       ; Request Codes: $00000000 Process Request Response Codes: $80000000 Request Successful, $80000001 Partial Response
+; Sequence Of Concatenated Tags
+  dw Set_Physical_Display ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw SCREEN_X ; Value Buffer
+  dw SCREEN_Y ; Value Buffer
+
+  dw Set_Virtual_Buffer ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw SCREEN_X ; Value Buffer
+  dw SCREEN_Y ; Value Buffer
+
+  dw Set_Depth ; Tag Identifier
+  dw $00000004 ; Value Buffer Size In Bytes
+  dw $00000004 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw BITS_PER_PIXEL ; Value Buffer
+
+  dw Set_Virtual_Offset ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+FB_OFFSET_X:
+  dw 0 ; Value Buffer
+FB_OFFSET_Y:
+  dw 0 ; Value Buffer
+
+  dw Allocate_Buffer ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
 FB_POINTER:
-  dw 0 ; Frame Buffer Pointer (Set By GPU)
-  dw 0 ; Frame Buffer Size (Set By GPU)
+  dw 0 ; Value Buffer
+  dw 0 ; Value Buffer
+
+dw $00000000 ; $0 (End Tag)
+FB_STRUCT_END:
 
 align 16
 TAGS_STRUCT: ; Mailbox Property Interface Buffer Structure
