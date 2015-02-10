@@ -38,13 +38,13 @@ LoopFrames:
     ldrb r3,[r0],1 ; R3 = Flag Data For Next 8 Blocks (0 = Uncompressed Byte, 1 = Compressed Bytes)
     mov r4,10000000b ; R4 = Flag Data Block Type Shifter
     LZBlockLoop:
-      cmp r1,r2 ; IF(Destination Address == Destination End Offset) LZEnd
+      cmp r1,r2 ; IF (Destination Address == Destination End Offset) LZEnd
       beq LZEnd
-      cmp r4,0 ; IF(Flag Data Block Type Shifter == 0) LZLoop
+      cmp r4,0 ; IF (Flag Data Block Type Shifter == 0) LZLoop
       beq LZLoop
       tst r3,r4 ; Test Block Type
-      mov r4,r4,lsr 1 ; Shift R4 To Next Flag Data Block Type
-      bne LZDecode ; IF(BlockType != 0) LZDecode Bytes
+      lsr r4,1 ; Shift R4 To Next Flag Data Block Type
+      bne LZDecode ; IF (BlockType != 0) LZDecode Bytes
       ldrb r5,[r0],1 ; ELSE Copy Uncompressed Byte
       strb r5,[r1],1 ; Store Uncompressed Byte To Destination
       b LZBlockLoop
@@ -53,18 +53,18 @@ LoopFrames:
 	ldrb r5,[r0],1 ; R5 = Number Of Bytes To Copy & Disp MSB's
 	ldrb r6,[r0],1 ; R6 = Disp LSB's
 	add r6,r5,lsl 8
-	mov r5,r5,lsr 4 ; R5 = Number Of Bytes To Copy (Minus 3)
+	lsr r5,4 ; R5 = Number Of Bytes To Copy (Minus 3)
 	add r5,3 ; R5 = Number Of Bytes To Copy
 	mov r7,$1000
 	sub r7,1 ; R7 = $FFF
 	and r6,r7 ; R6 = Disp
-	add r6,r6,1 ; R6 = Disp + 1
-	sub r6,r1,r6 ; R6 = Destination - Disp - 1
+	add r6,1 ; R6 = Disp + 1
+	rsb r6,r1 ; R6 = Destination - Disp - 1
 	LZCopy:
-	  ldrb r7,[r6],1
-	  strb r7,[r1],1
-	  subs r5,1
-	  bne LZCopy
+	  ldrb r7,[r6],1 ; R7 = Byte To Copy
+	  strb r7,[r1],1 ; Store Byte To RAM
+	  subs r5,1 ; Number Of Bytes To Copy -= 1
+	  bne LZCopy ; IF (Number Of Bytes To Copy != 0) LZCopy Bytes
 	  b LZBlockLoop
    LZEnd:
 
@@ -83,7 +83,7 @@ decodeGRB:
   LoopG: ; Loop Green Pixels (1:1)
     ldrb r5,[r1],1 ; Load G Byte
     strb r5,[r4],3 ; Store G Byte
-    cmp r1,r2 ; IF(G Offset != R Offset) Loop G
+    cmp r1,r2 ; IF (G Offset != R Offset) Loop G
     bne LoopG
 
   mov r4,r7
@@ -101,7 +101,7 @@ decodeGRB:
     moveq r6,SCREEN_X / 2
     addeq r4,SCREEN_X * 3
 
-    cmp r2,r3 ; IF(R Offset != R Offset) Loop R
+    cmp r2,r3 ; IF (R Offset != R Offset) Loop R
     bne LoopR
 
   add r1,r3,SCREEN_X * SCREEN_Y / 16 ; B End Offset
@@ -134,10 +134,10 @@ decodeGRB:
     moveq r6,SCREEN_X / 4
     addeq r4,SCREEN_X * 9
 
-    cmp r3,r1 ; IF(B Offset != B End Offset) Loop B
+    cmp r3,r1 ; IF (B Offset != B End Offset) Loop B
     bne LoopB
 
-subs r12,1
+subs r12,1 ; Frame Count --
 bne LoopFrames
 b LoopVideo
 
@@ -182,6 +182,5 @@ FB_POINTER:
 dw $00000000 ; $0 (End Tag)
 FB_STRUCT_END:
 
-LZVideo:
-file 'Video.lz'
+LZVideo: file 'Video.lz'
 GRB:
