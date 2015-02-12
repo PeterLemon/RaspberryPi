@@ -1,12 +1,13 @@
-; Raspberry Pi 2 'Bare Metal' Julia Fractal Animation Demo by krom (Peter Lemon):
-; 1. Turn On Vector Floating Point Unit
-; 2. Setup Frame Buffer
-; 3. Plot Fractal Using Double-Precision
-; 4. Change Julia Settings & Redraw To Animate
+; Raspberry Pi 'Bare Metal' Julia Fractal Animation Demo by krom (Peter Lemon):
+; 1. Turn On L1 Cache
+; 2. Turn On Vector Floating Point Unit
+; 3. Setup Frame Buffer
+; 4. Plot Fractal Using Double-Precision
+; 5. Change Julia Settings & Redraw To Animate
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
-include 'LIB\R_PI2.INC'
+include 'LIB\R_PI.INC'
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
@@ -27,7 +28,7 @@ mrc p15,0,r0,c1,c0,2 ; R0 = Access Control Register
 orr r0,$300000 + $C00000 ; Enable Single & Double Precision
 mcr p15,0,r0,c1,c0,2 ; Access Control Register = R0
 mov r0,$40000000 ; R0 = Enable VFP
-vmsr fpexc,r0 ; FPEXC = R0
+fmxr fpexc,r0 ; FPEXC = R0
 
 FB_Init:
   imm32 r0,FB_STRUCT + MAIL_TAGS
