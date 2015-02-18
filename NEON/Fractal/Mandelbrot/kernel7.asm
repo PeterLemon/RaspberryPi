@@ -58,34 +58,34 @@ flds s7,[YMIN] ; S7 = YMin
 flds s8,[RMAX] ; S8 = RMax
 flds s9,[ONE]  ; S9 = 1.0
 
+fsubs s16,s4,s6 ; S16 = XMax - XMin
+fsubs s17,s5,s7 ; S17 = YMax - YMin
+fdivs s18,s9,s2 ; S18 = (1.0 / SX)
+fdivs s19,s9,s3 ; S19 = (1.0 / SY)
+
 ldr r12,[COL_MUL] ; R12 = Multiply Colour
 
 LoopY:
   fcpys s0,s2 ; S0 = X%
   LoopX:
-    vsub.f32 d5,d2,d3 ; CX = XMin + ((X% * (XMax - XMin)) / SX)
-    vmul.f32 d5,d0    ; CY = YMin + ((Y% * (YMax - YMin)) / SY)
-    fdivs s10,s2
-    fdivs s11,s3
+    vmul.f32 d5,d0,D8 ; CX = XMin + ((X% * (XMax - XMin)) * (1.0 / SX))
+    vmul.f32 d5,d9    ; CY = YMin + ((Y% * (YMax - YMin)) * (1.0 / SY))
     vadd.f32 d5,d3 ; S10 = CX, S11 = CY
 
     mov r1,192 ; R1 = IT (Iterations)
-    fsubs s12,s12 ; S12 = ZX
-    fsubs s13,s13 ; S13 = ZY
+    vsub.f32 d6,d6 ; S12 = ZX, S13 = ZY
 
     Iterate:
       fmuls s14,s13,s13 ; XN = ((ZX * ZX) - (ZY * ZY)) + CX
       fmscs s14,s12,s12
-      fadds s14,s10 ; S14 = XN
-
       fmuls s15,s12,s13 ; YN = (2 * ZX * ZY) + CY
       fadds s15,s15
-      fadds s15,s11 ; S15 = YN
+      vadd.f32 d7,d5 ; S14 = XN, S15 = YN
 
       fcpyd d6,d7 ; Copy XN & YN To ZX & ZY For Next Iteration
 
-      fmuls s14,s12,s12 ; R = (XN * XN) + (YN * YN)
-      fmacs s14,s13,s13 ; S14 = R
+      vmul.f32 d7,d6,d6 ; R = (XN * XN) + (YN * YN)
+      fadds s14,s15 ; S14 = R
 
       fcmps s14,s8 ; IF (R > 4) Plot
       fmstat

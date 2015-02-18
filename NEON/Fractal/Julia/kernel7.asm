@@ -56,8 +56,14 @@ flds s4,[XMAX] ; S4 = XMax
 flds s5,[YMAX] ; S5 = YMax
 flds s6,[XMIN] ; S6 = XMin
 flds s7,[YMIN] ; S7 = YMin
-flds s8,[ANIM] ; S8 = Anim
+flds s8,[RMAX] ; S8 = RMax
 flds s9,[ONE]  ; S9 = 1.0
+flds s16,[ANIM] ; S16 = Anim
+
+fsubs s18,s4,s6 ; S18 = XMax - XMin
+fsubs s19,s5,s7 ; S19 = YMax - YMin
+fdivs s20,s9,s2 ; S20 = (1.0 / SX)
+fdivs s21,s9,s3 ; S21 = (1.0 / SY)
 
 fcpys s12,s9 ; S12 = CX (1.0)
 fcpys s13,s7 ; S13 = CY (-2.0)
@@ -71,37 +77,32 @@ Refresh:
   LoopY:
     fcpys s0,s2 ; S0 = X%
     LoopX:
-      vsub.f32 d5,d2,d3 ; ZX = XMin + ((X% * (XMax - XMin)) / SX)
-      vmul.f32 d5,d0	; ZY = YMin + ((Y% * (YMax - YMin)) / SY)
-      fdivs s10,s2
-      fdivs s11,s3
+      vmul.f32 d5,d0,d9 ; ZX = XMin + ((X% * (XMax - XMin)) * (1.0 / SX))
+      vmul.f32 d5,d10	; ZY = YMin + ((Y% * (YMax - YMin)) * (1.0 / SY))
       vadd.f32 d5,d3 ; S10 = ZX, S11 = ZY
 
       mov r4,192 ; R4 = IT (Iterations)
       Iterate:
 	fmuls s14,s11,s11 ; XN = ((ZX * ZX) - (ZY * ZY)) + CX
 	fmscs s14,s10,s10
-	fadds s14,s12 ; S14 = XN
-
 	fmuls s15,s10,s11 ; YN = (2 * ZX * ZY) + CY
 	fadds s15,s15
-	fadds s15,s13 ; S15 = YN
+	vadd.f32 d7,d6 ; S14 = XN, S15 = YN
 
 	fcpyd d5,d7 ; Copy XN & YN To ZX & ZY For Next Iteration
 
-	fmuls s14,s14 ; R = (XN * XN) + (YN * YN)
-	fmacs s14,s15,s15 ; S14 = R
+	vmul.f32 d7,d7 ; R = (XN * XN) + (YN * YN)
+	fadds s14,s15 ; S14 = R
 
-	ftouis s31,s14 ; IF (R > 4) Plot
-	fmrs r5,s31
-	cmp r5,4
+	fcmps s14,s8 ; IF (R > 4) Plot
+	fmstat
 	bgt Plot
 
 	subs r4,1 ; IT -= 1
 	bne Iterate ; IF (IT != 0) Iterate
 
       Plot:
-	mul r4,r12 ; R3 = Pixel Colour
+	mul r4,r12 ; R4 = Pixel Colour
 	orr r4,$FF000000 ; Force Alpha To $FF
 	str r4,[r2],4  ; Store Pixel Colour To Frame Buffer (Top)
 	str r4,[r3],-4 ; Store Pixel Colour To Frame Buffer (Bottom)
@@ -115,16 +116,17 @@ Refresh:
 	cmp r2,r3
 	blt LoopY ; IF (Y% != 0) LoopY
 
-	fsubs s12,s8 ; Change Julia Settings
-	fadds s13,s8
+	fsubs s12,s16 ; Change Julia Settings
+	fadds s13,s16
 	b Refresh
 
 XMAX: dw 3.0
 YMAX: dw 2.0
 XMIN: dw -3.0
 YMIN: dw -2.0
-ANIM: dw 0.001
+RMAX: dw 4.0
 ONE:  dw 1.0
+ANIM: dw 0.001
 
 COL_MUL: dw $231AF9 ; Multiply Colour
 LAST_PIXEL: dw (SCREEN_X * SCREEN_Y * (BITS_PER_PIXEL / 8)) - (BITS_PER_PIXEL / 8)
