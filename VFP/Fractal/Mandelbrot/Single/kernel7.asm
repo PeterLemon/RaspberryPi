@@ -1,6 +1,6 @@
 ; Raspberry Pi 2 'Bare Metal' Mandelbrot Fractal Demo by krom (Peter Lemon):
 ; 1. Turn On L1 Cache
-; 2. Turn On Advanced SIMD & Vector Floating Point Unit (NEON MPE)
+; 2. Turn On Vector Floating Point Unit
 ; 3. Setup Frame Buffer
 ; 4. Plot Fractal Using Single-Precision
 
@@ -58,19 +58,22 @@ flds s7,[YMIN] ; S7 = YMin
 flds s8,[RMAX] ; S8 = RMax
 flds s9,[ONE]  ; S9 = 1.0
 
+fsubs s16,s4,s6 ; S16 = XMax - XMin
+fsubs s17,s5,s7 ; S17 = YMax - YMin
+fdivs s18,s9,s2 ; S18 = (1.0 / SX)
+fdivs s19,s9,s3 ; S19 = (1.0 / SY)
+
 ldr r12,[COL_MUL] ; R12 = Multiply Colour
 
 LoopY:
   fcpys s0,s2 ; S0 = X%
   LoopX:
-    fsubs s10,s4,s6 ; CX = XMin + ((X% * (XMax - XMin)) / SX)
-    fmuls s10,s0
-    fdivs s10,s2
+    fmuls s10,s0,s16 ; CX = XMin + ((X% * (XMax - XMin)) * (1.0 / SX))
+    fmuls s10,s18
     fadds s10,s6 ; S10 = CX
 
-    fsubs s11,s5,s7 ; CY = YMin + ((Y% * (YMax - YMin)) / SY)
-    fmuls s11,s1
-    fdivs s11,s3
+    fmuls s11,s1,s17 ; CY = YMin + ((Y% * (YMax - YMin)) * (1.0 / SY))
+    fmuls s11,s19
     fadds s11,s7 ; S11 = CY
 
     mov r1,192 ; R1 = IT (Iterations)

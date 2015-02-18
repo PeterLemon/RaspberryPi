@@ -1,6 +1,6 @@
 ; Raspberry Pi 2 'Bare Metal' Julia Fractal Animation Demo by krom (Peter Lemon):
 ; 1. Turn On L1 Cache
-; 2. Turn On Advanced SIMD & Vector Floating Point Unit (NEON MPE)
+; 2. Turn On Vector Floating Point Unit
 ; 3. Setup Frame Buffer
 ; 4. Plot Fractal Using Single-Precision
 ; 5. Change Julia Settings & Redraw To Animate
@@ -56,8 +56,14 @@ flds s4,[XMAX] ; S4 = XMax
 flds s5,[YMAX] ; S5 = YMax
 flds s6,[XMIN] ; S6 = XMin
 flds s7,[YMIN] ; S7 = YMin
-flds s8,[ANIM] ; S8 = Anim
+flds s8,[RMAX] ; S8 = RMax
 flds s9,[ONE]  ; S9 = 1.0
+flds s16,[ANIM] ; S16 = Anim
+
+fsubs s17,s4,s6 ; S17 = XMax - XMin
+fsubs s18,s5,s7 ; S18 = YMax - YMin
+fdivs s19,s9,s2 ; S19 = (1.0 / SX)
+fdivs s20,s9,s3 ; S20 = (1.0 / SY)
 
 fcpys s12,s9 ; S12 = CX (1.0)
 fcpys s13,s7 ; S13 = CY (-2.0)
@@ -71,14 +77,12 @@ Refresh:
   LoopY:
     fcpys s0,s2 ; S0 = X%
     LoopX:
-      fsubs s10,s4,s6 ; ZX = XMin + ((X% * (XMax - XMin)) / SX)
-      fmuls s10,s0
-      fdivs s10,s2
+      fmuls s10,s0,s17 ; ZX = XMin + ((X% * (XMax - XMin)) * (1.0 / SX))
+      fmuls s10,s19
       fadds s10,s6 ; S10 = ZX
 
-      fsubs s11,s5,s7 ; ZY = YMin + ((Y% * (YMax - YMin)) / SY)
-      fmuls s11,s1
-      fdivs s11,s3
+      fmuls s11,s1,s18 ; ZY = YMin + ((Y% * (YMax - YMin)) * (1.0 / SY))
+      fmuls s11,s20
       fadds s11,s7 ; S11 = ZY
 
       mov r4,192 ; R4 = IT (Iterations)
@@ -96,16 +100,15 @@ Refresh:
 	fmuls s14,s14 ; R = (XN * XN) + (YN * YN)
 	fmacs s14,s15,s15 ; S14 = R
 
-	ftouis s31,s14 ; IF (R > 4) Plot
-	fmrs r5,s31
-	cmp r5,4
+	fcmps s14,s8 ; IF (R > 4) Plot
+	fmstat
 	bgt Plot
 
 	subs r4,1 ; IT -= 1
 	bne Iterate ; IF (IT != 0) Iterate
 
       Plot:
-	mul r4,r12 ; R3 = Pixel Colour
+	mul r4,r12 ; R4 = Pixel Colour
 	orr r4,$FF000000 ; Force Alpha To $FF
 	str r4,[r2],4  ; Store Pixel Colour To Frame Buffer (Top)
 	str r4,[r3],-4 ; Store Pixel Colour To Frame Buffer (Bottom)
@@ -119,16 +122,17 @@ Refresh:
 	cmp r2,r3
 	blt LoopY ; IF (Y% != 0) LoopY
 
-	fsubs s12,s8 ; Change Julia Settings
-	fadds s13,s8
+	fsubs s12,s16 ; Change Julia Settings
+	fadds s13,s16
 	b Refresh
 
 XMAX: dw 3.0
 YMAX: dw 2.0
 XMIN: dw -3.0
 YMIN: dw -2.0
-ANIM: dw 0.001
+RMAX: dw 4.0
 ONE:  dw 1.0
+ANIM: dw 0.001
 
 COL_MUL: dw $231AF9 ; Multiply Colour
 LAST_PIXEL: dw (SCREEN_X * SCREEN_Y * (BITS_PER_PIXEL / 8)) - (BITS_PER_PIXEL / 8)

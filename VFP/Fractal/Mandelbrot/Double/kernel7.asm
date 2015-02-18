@@ -1,6 +1,6 @@
 ; Raspberry Pi 2 'Bare Metal' Mandelbrot Fractal Demo by krom (Peter Lemon):
 ; 1. Turn On L1 Cache
-; 2. Turn On Advanced SIMD & Vector Floating Point Unit (NEON MPE)
+; 2. Turn On Vector Floating Point Unit
 ; 3. Setup Frame Buffer
 ; 4. Plot Fractal Using Double-Precision
 
@@ -51,6 +51,9 @@ fmsr s31,r1
 fsitod d1,s31 ; D1 = Y%
 fcpyd d3,d1   ; D3 = SY
 
+fmrrd r8,r9,d2 ; R8 & R9 = SX
+fmrrd r10,r11,d3 ; R10 & R11 = SY
+
 fldd d4,[XMAX] ; D4 = XMax
 fldd d5,[YMAX] ; D5 = YMax
 fldd d6,[XMIN] ; D6 = XMin
@@ -58,19 +61,22 @@ fldd d7,[YMIN] ; D7 = YMin
 fldd d8,[RMAX] ; D8 = RMax
 fldd d9,[ONE]  ; D9 = 1.0
 
+fsubd d4,d6 ; D4 = XMax - XMin
+fsubd d5,d7 ; D5 = YMax - YMin
+fdivd d2,d9,d2 ; D2 = (1.0 / SX)
+fdivd d3,d9,d3 ; D3 = (1.0 / SY)
+
 ldr r12,[COL_MUL] ; R12 = Multiply Colour
 
 LoopY:
-  fcpyd d0,d2 ; D0 = X%
+  fmdrr d0,r8,r9 ; D0 = X%
   LoopX:
-    fsubd d10,d4,d6 ; CX = XMin + ((X% * (XMax - XMin)) / SX)
-    fmuld d10,d0
-    fdivd d10,d2
+    fmuld d10,d0,d4 ; CX = XMin + ((X% * (XMax - XMin)) * (1.0 / SX))
+    fmuld d10,d2
     faddd d10,d6 ; D10 = CX
 
-    fsubd d11,d5,d7 ; CY = YMin + ((Y% * (YMax - YMin)) / SY)
-    fmuld d11,d1
-    fdivd d11,d3
+    fmuld d11,d1,d5 ; CY = YMin + ((Y% * (YMax - YMin)) * (1.0 / SY))
+    fmuld d11,d3
     faddd d11,d7 ; D11 = CY
 
     mov r1,192 ; R1 = IT (Iterations)
