@@ -14,6 +14,10 @@ http://www.dex-os.com/DexBasic/DexBasic.htm<br />
 <br />
 Also special thanks to phire, who helped me get my 1st triangle on the screen using the GPU =D<br />
 <br />
+Also special thanks to rst, who helped me get my 1st SMP demo running using all 4 CPU cores of the Raspberry Pi 2 =D<br />
+Please check out Circle by rst, a C++ bare metal environment (with USB) for Raspberry Pi 1 & 2:<br />
+https://github.com/rsta2/circle<br />
+<br />
 For more information about coding the ARM CPU please visit my webpage that I run with SimonB:<br />
 http://gbadev.org<br />
 http://forum.gbadev.org<br />
