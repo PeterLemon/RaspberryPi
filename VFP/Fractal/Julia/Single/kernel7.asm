@@ -109,7 +109,6 @@ Refresh:
 
       Plot:
 	mul r4,r12 ; R4 = Pixel Colour
-	orr r4,$FF000000 ; Force Alpha To $FF
 	str r4,[r2],4  ; Store Pixel Colour To Frame Buffer (Top)
 	str r4,[r3],-4 ; Store Pixel Colour To Frame Buffer (Bottom)
 
@@ -119,8 +118,8 @@ Refresh:
 	bne LoopX ; IF (X% != 0) LoopX
 
 	fsubs s1,s9 ; Decrement Y%
-	cmp r2,r3
-	blt LoopY ; IF (Y% != 0) LoopY
+	cmp r2,r3 ; Compare Frame Buffer Top & Bottom
+	blt LoopY ; IF (Y% < Frame Buffer Middle) LoopY
 
 	fsubs s12,s16 ; Change Julia Settings
 	fadds s13,s16
