@@ -96,7 +96,6 @@ LoopY:
 
     Plot:
       mul r1,r12 ; R1 = Pixel Colour
-      orr r1,$FF000000 ; Force Alpha To $FF
       str r1,[r0],-4 ; Store Pixel Colour To Frame Buffer
 
       fsubs s0,s9 ; Decrement X%
