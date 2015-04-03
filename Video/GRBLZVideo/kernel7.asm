@@ -16,6 +16,15 @@ Core3Boot = $4000008C + ($10 * 3) ; Core 3 Boot Offset
 
 org $8000
 
+; Wake SMP Cores
+imm32 r0,CoreCode ; R0 = Core 1,2,3 Code Offset
+imm32 r1,Core1Boot ; R1 = Core 1 Boot Offset
+imm32 r2,Core2Boot ; R2 = Core 2 Boot Offset
+imm32 r3,Core3Boot ; R3 = Core 3 Boot Offset
+str r0,[r1] ; Write Core 1 Code Offset To Core 1 Boot Offset
+str r0,[r2] ; Write Core 2 Code Offset To Core 2 Boot Offset
+str r0,[r3] ; Write Core 3 Code Offset To Core 3 Boot Offset
+
 ; Start L1 Cache
 mrc p15,0,r0,c1,c0,0 ; R0 = System Control Register
 orr r0,$0004 ; Data Cache (Bit 2)
@@ -31,15 +40,6 @@ FB_Init:
   ldr r13,[FB_POINTER] ; R13 = Frame Buffer Pointer
   cmp r13,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
-
-; Wake SMP Cores
-imm32 r0,CoreCode ; R0 = Core 1,2,3 Code Offset
-imm32 r1,Core1Boot ; R1 = Core 1 Boot Offset
-imm32 r2,Core2Boot ; R2 = Core 2 Boot Offset
-imm32 r3,Core3Boot ; R3 = Core 3 Boot Offset
-str r0,[r1] ; Write Core 1 Code Offset To Core 1 Boot Offset
-str r0,[r2] ; Write Core 2 Code Offset To Core 2 Boot Offset
-str r0,[r3] ; Write Core 3 Code Offset To Core 3 Boot Offset
 
 LoopVideo:
   imm32 r0,LZVideo ; R0 = Source Address
