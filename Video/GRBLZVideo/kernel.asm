@@ -27,6 +27,9 @@ FB_Init:
   cmp r13,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
+  and r13,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r13,[FB_POINTER] ; Store Frame Buffer Pointer Physical Address
+
 LoopVideo:
   imm32 r0,LZVideo ; R0 = Source Address
   imm32 r12,615 ; R12 = Frame Count
