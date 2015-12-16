@@ -22,6 +22,9 @@ FB_Init:
   cmp r1,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
+  and r1,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r1,[FB_POINTER] ; Store Frame Buffer Pointer Physical Address
+
 imm32 r0,Huff ; R0 = Source Address, R1 = Destination Address
 
 ldr r2,[r0],4 ; R2 = Data Length & Header Info
