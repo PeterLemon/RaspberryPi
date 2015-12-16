@@ -109,6 +109,9 @@ FB_Init:
   cmp r10,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
+  and r10,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r10,[r1] ; Store Frame Buffer Pointer Physical Address
+
 imm32 r1,0 + (SCREEN_X * 8)
 add r0,r10,r1 ; Place Text At XY Position 0,8
 PrintText VCText, 12
