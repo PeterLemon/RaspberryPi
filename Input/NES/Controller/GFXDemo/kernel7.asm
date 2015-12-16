@@ -20,11 +20,11 @@ include 'LIB\R_PI2.INC'
 JOY_RIGHT  = 00000001b
 JOY_LEFT   = 00000010b
 JOY_DOWN   = 00000100b
-JOY_UP     = 00001000b
+JOY_UP	   = 00001000b
 JOY_START  = 00010000b
 JOY_SELECT = 00100000b
-JOY_B      = 01000000b
-JOY_A      = 10000000b
+JOY_B	   = 01000000b
+JOY_A	   = 10000000b
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
@@ -45,6 +45,9 @@ FB_Init:
   ldr r0,[FB_POINTER] ; R0 = Frame Buffer Pointer
   cmp r0,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
+
+  and r0,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r0,[FB_POINTER] ; Store Frame Buffer Pointer Physical Address
 
 ; Set Control Block Data Destination Address
 str r0,[SCRBUF_DEST]

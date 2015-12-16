@@ -17,18 +17,18 @@ include 'LIB\FASMARM.INC'
 include 'LIB\R_PI2.INC'
 
 ; Setup Input
-JOY_R      = 0000000000010000b
-JOY_L      = 0000000000100000b
-JOY_X      = 0000000001000000b
-JOY_A      = 0000000010000000b
+JOY_R	   = 0000000000010000b
+JOY_L	   = 0000000000100000b
+JOY_X	   = 0000000001000000b
+JOY_A	   = 0000000010000000b
 JOY_RIGHT  = 0000000100000000b
 JOY_LEFT   = 0000001000000000b
 JOY_DOWN   = 0000010000000000b
-JOY_UP     = 0000100000000000b
+JOY_UP	   = 0000100000000000b
 JOY_START  = 0001000000000000b
 JOY_SELECT = 0010000000000000b
-JOY_Y      = 0100000000000000b
-JOY_B      = 1000000000000000b
+JOY_Y	   = 0100000000000000b
+JOY_B	   = 1000000000000000b
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
@@ -49,6 +49,9 @@ FB_Init:
   ldr r0,[FB_POINTER] ; R0 = Frame Buffer Pointer
   cmp r0,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
+
+  and r0,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r0,[FB_POINTER] ; Store Frame Buffer Pointer Physical Address
 
 ; Set Control Block Data Destination Address
 str r0,[SCRBUF_DEST]
