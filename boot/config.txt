@@ -1,3 +1,2 @@
-force_turbo=1
 disable_overscan=1
 framebuffer_swap=0
