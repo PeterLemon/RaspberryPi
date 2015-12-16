@@ -26,6 +26,9 @@ FB_Init:
   cmp r0,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
+  and r0,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r0,[FB_POINTER] ; Store Frame Buffer Pointer Physical Address
+
 ; Draw Characters
 imm32 r1,256 + (SCREEN_X * 32)
 add r0,r1 ; Place Text At XY Position 256,32
