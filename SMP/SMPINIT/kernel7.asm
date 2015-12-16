@@ -113,6 +113,9 @@ FB_Init:
   cmp r10,0 ; Compare Frame Buffer Pointer To Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
+  and r10,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r10,[r1] ; Store Frame Buffer Pointer Physical Address
+
 ; Wake SMP Cores
 imm32 r0,Core1Code ; R0 = Core 1 Code Offset
 imm32 r1,Core1Boot ; R1 = Core 1 Boot Offset
