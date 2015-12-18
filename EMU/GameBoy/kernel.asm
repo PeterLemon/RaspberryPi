@@ -13,8 +13,8 @@ include 'MEM.INC'
 ; Setup Frame Buffer
 SCREEN_X       = 256
 SCREEN_Y       = 256
-;SCREEN_X       = 160 ; UNREM These 2 Lines To See BIOS Nintendo Logo Scroll
-;SCREEN_Y       = 144
+;SCREEN_X	= 160 ; UNREM These 2 Lines To See BIOS Nintendo Logo Scroll
+;SCREEN_Y	= 144
 VSCREEN_X      = 256
 VSCREEN_Y      = 256
 BITS_PER_PIXEL = 8
@@ -29,7 +29,7 @@ H_FLAG = $20 ; F Register Bit 5 Half Carry Flag
 N_FLAG = $40 ; F Register Bit 6 Negative Flag
 Z_FLAG = $80 ; F Register Bit 7 Zero Flag
 
-org BUS_ADDRESSES_l2CACHE_ENABLED + $8000
+org $0000
 
 ; Start L1 Cache
 mov r0,0

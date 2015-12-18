@@ -115,6 +115,9 @@ FB_Init:
   cmp r12,0 ; Compare Frame Buffer Pointer to Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
+  and r12,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r12,[r5] ; Store Frame Buffer Pointer Physical Address
+
 ; Draw Characters
 mov r5,32 ; r5 = Number Of Characters To Display On Row
 mov r6,32 ; r6 = Number Of Characters To Display On Column
