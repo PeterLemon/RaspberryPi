@@ -7,7 +7,7 @@ format binary as 'img'
 include 'LIB\FASMARM.INC'
 include 'LIB\R_PI.INC'
 
-org $8000
+org $0000
 
 ; Set GPIO 40 & 45 (Phone Jack) To Alternate PWM Function 0
 imm32 r0,PERIPHERAL_BASE + GPIO_BASE

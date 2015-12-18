@@ -9,7 +9,7 @@ format binary as 'img'
 include 'LIB\FASMARM.INC'
 include 'LIB\R_PI.INC'
 
-org $8000
+org $0000
 
 ; Convert Sample
 imm32 r0,SND_Sample

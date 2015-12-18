@@ -9,7 +9,12 @@ format binary as 'img'
 include 'LIB\FASMARM.INC'
 include 'LIB\R_PI2.INC'
 
-org $8000
+org $0000
+
+; Return CPU ID (0..3) Of The CPU Executed On
+mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
+ands r0,3 ; R0 = CPU ID (Bits 0..1)
+bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
 ; Convert Sample
 imm32 r0,SND_Sample
@@ -61,6 +66,9 @@ str r1,[r0,DMA_CS] ; Start DMA
 
 Loop:
   b Loop ; Play Sample Again
+
+CoreLoop: ; Infinite Loop For Core 1..3
+  b CoreLoop
 
 align 32
 CB_STRUCT: ; Control Block Data Structure
