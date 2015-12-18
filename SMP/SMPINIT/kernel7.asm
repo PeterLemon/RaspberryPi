@@ -1,7 +1,8 @@
 ; Raspberry Pi 2 'Bare Metal' Symmetric Multi-Processing (SMP) Demo by krom (Peter Lemon):
 ; 1. Setup Frame Buffer
-; 2. Wake SMP Cores
-; 3. Copy Result Value HEX Characters To Frame Buffer Using CPU
+; 2. Get SMP CPU ID
+; 3. Return Results From Each Core
+; 4. Copy Result Value HEX Characters To Frame Buffer Using CPU
 
 macro PrintText Text, TextLength {
   local .DrawChars,.DrawChar
@@ -96,12 +97,7 @@ BITS_PER_PIXEL = 8
 CHAR_X = 8
 CHAR_Y = 8
 
-; Setup SMP (Boot Offset = $4000008C + ($10 * Core), Core = 1..3)
-Core1Boot = $4000008C + ($10 * 1) ; Core 1 Boot Offset
-Core2Boot = $4000008C + ($10 * 2) ; Core 2 Boot Offset
-Core3Boot = $4000008C + ($10 * 3) ; Core 3 Boot Offset
-
-org $8000
+org $0000
 
 FB_Init:
   imm32 r0,FB_STRUCT + MAIL_TAGS
@@ -116,18 +112,16 @@ FB_Init:
   and r10,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
   str r10,[r1] ; Store Frame Buffer Pointer Physical Address
 
-; Wake SMP Cores
-imm32 r0,Core1Code ; R0 = Core 1 Code Offset
-imm32 r1,Core1Boot ; R1 = Core 1 Boot Offset
-str r0,[r1] ; Write Core 1 Code Offset To Core 1 Boot Offset
+; Return CPU ID (0..3) Of The CPU Executed On
+mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
+and r0,3 ; R0 = CPU ID (Bits 0..1)
 
-imm32 r0,Core2Code ; R0 = Core 2 Code Offset
-imm32 r1,Core2Boot ; R1 = Core 2 Boot Offset
-str r0,[r1] ; Write Core 2 Code Offset To Core 2 Boot Offset
-
-imm32 r0,Core3Code ; R0 = Core 3 Code Offset
-imm32 r1,Core3Boot ; R1 = Core 3 Boot Offset
-str r0,[r1] ; Write Core 3 Code Offset To Core 3 Boot Offset
+cmp r0,1 ; IF (CPU ID == 1) Branch To Core 1 Code
+beq Core1Code
+cmp r0,2 ; IF (CPU ID == 2) Branch To Core 2 Code
+beq Core2Code
+cmp r0,3 ; IF (CPU ID == 3) Branch To Core 3 Code
+beq Core3Code
 
 
 imm32 r1,8 + (SCREEN_X * 8)

@@ -1,8 +1,8 @@
 ; Raspberry Pi 2 'Bare Metal' Symmetric Multi-Processing (SMP) Julia Fractal Animation Demo by krom (Peter Lemon):
 ; 1. Turn On L1 Cache
 ; 2. Turn On Advanced SIMD & Vector Floating Point Unit (NEON MPE)
-; 3. Wake SMP Cores
-; 4. Setup Frame Buffer
+; 3. Setup Frame Buffer
+; 4. Get SMP CPU ID
 ; 5. Plot Fractal Using Single-Precision
 ; 6. Change Julia Settings & Redraw To Animate
 
@@ -15,35 +15,8 @@ SCREEN_X       = 640
 SCREEN_Y       = 480
 BITS_PER_PIXEL = 32
 
-; Setup SMP (Boot Offset = $4000008C + ($10 * Core), Core = 1..3)
-Core1Boot = $4000008C + ($10 * 1) ; Core 1 Boot Offset
-Core2Boot = $4000008C + ($10 * 2) ; Core 2 Boot Offset
-Core3Boot = $4000008C + ($10 * 3) ; Core 3 Boot Offset
+org $0000
 
-org $8000
-
-FB_Init:
-  imm32 r0,FB_STRUCT + MAIL_TAGS
-  imm32 r1,PERIPHERAL_BASE + MAIL_BASE + MAIL_WRITE + MAIL_TAGS
-  str r0,[r1] ; Mail Box Write
-
-  ldr r0,[FB_POINTER] ; R0 = Frame Buffer Pointer
-  cmp r0,0 ; Compare Frame Buffer Pointer To Zero
-  beq FB_Init ; IF Zero Re-Initialize Frame Buffer
-
-  and r0,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
-  str r0,[FB_POINTER] ; Store Frame Buffer Pointer Physical Address
-
-; Wake SMP Cores
-imm32 r0,Start ; R0 = Core 1,2,3 Code Offset
-imm32 r1,Core1Boot ; R1 = Core 1 Boot Offset
-imm32 r2,Core2Boot ; R2 = Core 2 Boot Offset
-imm32 r3,Core3Boot ; R3 = Core 3 Boot Offset
-str r0,[r1] ; Write Core 1 Code Offset To Core 1 Boot Offset
-str r0,[r2] ; Write Core 2 Code Offset To Core 2 Boot Offset
-str r0,[r3] ; Write Core 3 Code Offset To Core 3 Boot Offset
-
-Start:
 ; Start L1 Cache
 mrc p15,0,r0,c1,c0,0 ; R0 = System Control Register
 orr r0,$0004 ; Data Cache (Bit 2)
@@ -61,6 +34,18 @@ vmsr fpexc,r0 ; FPEXC = R0
 ; Return CPU ID (0..3) Of The CPU Executed On
 mrc p15,0,r5,c0,c0,5 ; R5 = Multiprocessor Affinity Register (MPIDR)
 and r5,3 ; R5 = CPU ID (Bits 0..1)
+
+FB_Init:
+  imm32 r0,FB_STRUCT + MAIL_TAGS
+  imm32 r1,PERIPHERAL_BASE + MAIL_BASE + MAIL_WRITE + MAIL_TAGS
+  str r0,[r1] ; Mail Box Write
+
+  ldr r0,[FB_POINTER] ; R0 = Frame Buffer Pointer
+  cmp r0,0 ; Compare Frame Buffer Pointer To Zero
+  beq FB_Init ; IF Zero Re-Initialize Frame Buffer
+
+  and r0,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
+  str r0,[FB_POINTER] ; Store Frame Buffer Pointer Physical Address
 
 mov r1,BITS_PER_PIXEL / 8 ; R1 = Pixel Byte Size
 mul r6,r5,r1 ; R6 = CPU ID * Pixel Byte Size
