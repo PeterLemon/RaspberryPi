@@ -35,6 +35,8 @@ bootcode.bin<br />
 start.elf<br />
 <br />
 You will need to create a "config.txt" file that contains the lines:<br />
+kernel_old=1<br />
+disable_commandline_tags=1<br />
 disable_overscan=1<br />
 framebuffer_swap=0<br />
 <br />
