@@ -14,7 +14,7 @@ SCREEN_X       = 640
 SCREEN_Y       = 480
 BITS_PER_PIXEL = 32
 
-org $8000
+org $0000
 
 ; Run Tags To Initialize V3D
 imm32 r0,PERIPHERAL_BASE + MAIL_BASE
