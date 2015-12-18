@@ -195,7 +195,12 @@ BITS_PER_PIXEL = 8
 CHAR_X = 8
 CHAR_Y = 8
 
-org $8000
+org $0000
+
+; Return CPU ID (0..3) Of The CPU Executed On
+mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
+ands r0,3 ; R0 = CPU ID (Bits 0..1)
+bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
 ; Run Tags
 imm32 r0,PERIPHERAL_BASE + MAIL_BASE
@@ -490,6 +495,9 @@ PrintTAGValueLE RightText, 8, FBOverscanRightValue, 4
 
 Loop:
   b Loop
+
+CoreLoop: ; Infinite Loop For Core 1..3
+  b CoreLoop
 
 align 16
 FB_STRUCT: ; Mailbox Property Interface Buffer Structure
