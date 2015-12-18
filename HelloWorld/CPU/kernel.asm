@@ -15,7 +15,7 @@ BITS_PER_PIXEL = 8
 CHAR_X = 8
 CHAR_Y = 8
 
-org $8000
+org $0000
 
 FB_Init:
   imm32 r0,FB_STRUCT + MAIL_TAGS
