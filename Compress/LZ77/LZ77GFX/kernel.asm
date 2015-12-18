@@ -11,7 +11,7 @@ SCREEN_X       = 640
 SCREEN_Y       = 480
 BITS_PER_PIXEL = 24
 
-org $8000
+org $0000
 
 FB_Init:
   imm32 r0,FB_STRUCT + MAIL_TAGS

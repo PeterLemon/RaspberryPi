@@ -5,7 +5,7 @@ format binary as 'img'
 include 'LIB\FASMARM.INC'
 include 'LIB\R_PI.INC'
 
-org $8000
+org $0000
 
 imm32 r0,Huff ; R0 = Source Address
 imm32 r1,Dest ; R1 = Destination Address

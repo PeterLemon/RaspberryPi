@@ -5,7 +5,12 @@ format binary as 'img'
 include 'LIB\FASMARM.INC'
 include 'LIB\R_PI2.INC'
 
-org $8000
+org $0000
+
+; Return CPU ID (0..3) Of The CPU Executed On
+mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
+ands r0,3 ; R0 = CPU ID (Bits 0..1)
+bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
 imm32 r0,LZ ; R0 = Source Address
 imm32 r1,Dest ; R1 = Destination Address
@@ -50,6 +55,9 @@ LZLoop:
 
 Loop:
   b Loop
+
+CoreLoop: ; Infinite Loop For Core 1..3
+  b CoreLoop
 
 align 4 ; LZ77 File Aligned To 4 Bytes
 LZ: file 'RaspiLogo24BPP.lz'

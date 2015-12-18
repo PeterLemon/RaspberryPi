@@ -11,7 +11,12 @@ SCREEN_X       = 640
 SCREEN_Y       = 480
 BITS_PER_PIXEL = 24
 
-org $8000
+org $0000
+
+; Return CPU ID (0..3) Of The CPU Executed On
+mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
+ands r0,3 ; R0 = CPU ID (Bits 0..1)
+bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
 FB_Init:
   imm32 r0,FB_STRUCT + MAIL_TAGS
@@ -75,6 +80,9 @@ HuffChunkLoop:
 
 Loop:
   b Loop
+
+CoreLoop: ; Infinite Loop For Core 1..3
+  b CoreLoop
 
 align 16
 FB_STRUCT: ; Mailbox Property Interface Buffer Structure
