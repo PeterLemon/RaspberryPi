@@ -9,7 +9,7 @@ SCREEN_X       = 320
 SCREEN_Y       = 240
 BITS_PER_PIXEL = 24
 
-org $8000
+org $0000
 
 ; Start L1 Cache
 mrc p15,0,r0,c1,c0,0 ; R0 = System Control Register

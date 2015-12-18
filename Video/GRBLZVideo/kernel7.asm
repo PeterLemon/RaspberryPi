@@ -9,21 +9,12 @@ SCREEN_X       = 320
 SCREEN_Y       = 240
 BITS_PER_PIXEL = 24
 
-; Setup SMP (Boot Offset = $4000008C + ($10 * Core), Core = 1..3)
-Core1Boot = $4000008C + ($10 * 1) ; Core 1 Boot Offset
-Core2Boot = $4000008C + ($10 * 2) ; Core 2 Boot Offset
-Core3Boot = $4000008C + ($10 * 3) ; Core 3 Boot Offset
+org $0000
 
-org $8000
-
-; Wake SMP Cores
-imm32 r0,CoreCode ; R0 = Core 1,2,3 Code Offset
-imm32 r1,Core1Boot ; R1 = Core 1 Boot Offset
-imm32 r2,Core2Boot ; R2 = Core 2 Boot Offset
-imm32 r3,Core3Boot ; R3 = Core 3 Boot Offset
-str r0,[r1] ; Write Core 1 Code Offset To Core 1 Boot Offset
-str r0,[r2] ; Write Core 2 Code Offset To Core 2 Boot Offset
-str r0,[r3] ; Write Core 3 Code Offset To Core 3 Boot Offset
+; Return CPU ID (0..3) Of The CPU Executed On
+mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
+ands r0,3 ; R0 = CPU ID (Bits 0..1)
+bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
 ; Start L1 Cache
 mrc p15,0,r0,c1,c0,0 ; R0 = System Control Register
@@ -158,8 +149,8 @@ subs r12,1 ; Frame Count --
 bne LoopFrames
 b LoopVideo
 
-CoreCode:
-  b CoreCode
+CoreLoop: ; Infinite Loop For Core 1..3
+  b CoreLoop
 
 align 16
 FB_STRUCT: ; Mailbox Property Interface Buffer Structure
