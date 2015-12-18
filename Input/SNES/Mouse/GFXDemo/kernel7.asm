@@ -39,7 +39,12 @@ POINTER_Y = 144
 POINTER_CENTER_X = (SCREEN_X / 2) - (POINTER_X / 2)
 POINTER_CENTER_Y = (SCREEN_Y / 2) - (POINTER_Y / 2)
 
-org $8000
+org $0000
+
+; Return CPU ID (0..3) Of The CPU Executed On
+mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
+ands r0,3 ; R0 = CPU ID (Bits 0..1)
+bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
 imm32 r0,PERIPHERAL_BASE + DMA_ENABLE ; Set DMA Channel 0 Enable Bit
 mov r1,DMA_EN0
@@ -206,6 +211,9 @@ ButtonComplete:
 str r0,[POINTER_SOURCE]
 
 b UpdateInput ; Refresh Input Data
+
+CoreLoop: ; Infinite Loop For Core 1..3
+  b CoreLoop
 
 MOUSE_DATA: dw 0
 MOUSE_X_POS: dw POINTER_CENTER_X
