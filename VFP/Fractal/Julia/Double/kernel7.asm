@@ -14,7 +14,12 @@ SCREEN_X       = 640
 SCREEN_Y       = 480
 BITS_PER_PIXEL = 32
 
-org $8000
+org $0000
+
+; Return CPU ID (0..3) Of The CPU Executed On
+mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
+ands r0,3 ; R0 = CPU ID (Bits 0..1)
+bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
 ; Start L1 Cache
 mrc p15,0,r0,c1,c0,0 ; R0 = System Control Register
@@ -131,6 +136,9 @@ Refresh:
 	fsubd d12,d8 ; Change Julia Settings
 	faddd d13,d8
 	b Refresh
+
+CoreLoop: ; Infinite Loop For Core 1..3
+  b CoreLoop
 
 XMAX: dd 3.0
 YMAX: dd 2.0
