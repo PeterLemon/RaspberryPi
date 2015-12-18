@@ -1,2 +1,4 @@
+kernel_old=1
+disable_commandline_tags=1
 disable_overscan=1
 framebuffer_swap=0
