@@ -9,8 +9,8 @@ I have included binaries of all the demos.<br />
 <br />
 Special thanks to Dex (Craig Bamford), who helped me get my 1st pixel on the screen =D<br />
 Please check out DexOS, a lightning fast bare metal OS, & his Raspberry Pi port of DexBasic:<br />
-http://www.dex-os.com<br />
-http://www.dex-os.com/DexBasic/DexBasic.htm<br />
+http://dex-os.github.io<br />
+http://dex-os.github.io/DexBasic/DexBasic.htm<br />
 <br />
 Also special thanks to phire, who helped me get my 1st triangle on the screen using the GPU =D<br />
 <br />
