@@ -84,7 +84,7 @@ Refresh: ; Refresh At 60 Hz
   imm32 r9,CPU_INST ; R9 = CPU Instruction Table
   CPU_EMU:
     ldrb r5,[r10,r4] ; R5 = CPU Instruction
-    add r5,r9,r5,lsl 8 ; R5 = CPU Instruction Table Opcode
+    add r5,r9,r5,lsl 7 ; R5 = CPU Instruction Table Opcode
     add r4,1 ; PC_REG++
     blx r5 ; Run CPU Instruction
 
@@ -174,7 +174,7 @@ CHAR_DEST:
   dw ((VSCREEN_X * (BITS_PER_PIXEL / 8)) - (CHAR_X * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw 0 ; DMA Next Control Block Address
 
-align 256
+align 128
 CPU_INST:
   include 'CPU.asm' ; CPU Instruction Table
 
