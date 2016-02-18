@@ -41,7 +41,7 @@ orr r0,$0004 ; Data
 orr r0,$0800 ; Branch Prediction
 mcr p15,0,r0,c1,c0,0 ; Write Control Register Configuration Data
 
-; Setup Z80 Registers
+; Setup CPU Registers
 mov r0,0 ; R0 = 16-Bit Register AF (Bits 0..7 = F, Bits 8..15 = A)
 mov r1,0 ; R1 = 16-Bit Register BC (Bits 0..7 = C, Bits 8..15 = B)
 mov r2,0 ; R2 = 16-Bit Register DE (Bits 0..7 = E, Bits 8..15 = D)
@@ -88,45 +88,61 @@ Refresh: ; Refresh At 60 Hz
     add r4,1 ; PC_REG++
     blx r5 ; Run CPU Instruction
 
-    include 'IOPORT.ASM' ; Run IO Port
+    include 'IOPORT.asm' ; Run IO Port
     cmp r12,r11 ; Compare Quad Cycles Counter
     blt CPU_EMU
 
-  include 'VIDEO.ASM' ; Run Video
+  include 'VIDEO.asm' ; Run Video
   b Refresh
 
 align 16
-FB_STRUCT: ; Frame Buffer Structure
-  dw SCREEN_X ; Frame Buffer Pixel Width
-  dw SCREEN_Y ; Frame Buffer Pixel Height
-  dw VSCREEN_X ; Frame Buffer Virtual Pixel Width
-  dw VSCREEN_X ; Frame Buffer Virtual Pixel Height
-  dw 0 ; Frame Buffer Pitch (Set By GPU)
-  dw BITS_PER_PIXEL ; Frame Buffer Bits Per Pixel
+FB_STRUCT: ; Mailbox Property Interface Buffer Structure
+  dw FB_STRUCT_END - FB_STRUCT ; Buffer Size In Bytes (Including The Header Values, The End Tag And Padding)
+  dw $00000000 ; Buffer Request/Response Code
+	       ; Request Codes: $00000000 Process Request Response Codes: $80000000 Request Successful, $80000001 Partial Response
+; Sequence Of Concatenated Tags
+  dw Set_Physical_Display ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw SCREEN_X ; Value Buffer
+  dw SCREEN_Y ; Value Buffer
+
+  dw Set_Virtual_Buffer ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw VSCREEN_X ; Value Buffer
+  dw VSCREEN_Y ; Value Buffer
+
+  dw Set_Depth ; Tag Identifier
+  dw $00000004 ; Value Buffer Size In Bytes
+  dw $00000004 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw BITS_PER_PIXEL ; Value Buffer
+
+  dw Set_Virtual_Offset ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
 FB_OFFSET_X:
-  dw 0 ; Frame Buffer Offset In X Direction
+  dw 0 ; Value Buffer
 FB_OFFSET_Y:
-  dw 0 ; Frame Buffer Offset In Y Direction
+  dw 0 ; Value Buffer
+
+  dw Set_Palette ; Tag Identifier
+  dw $00000018 ; Value Buffer Size In Bytes
+  dw $00000018 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
+  dw 0 ; Value Buffer (Offset: First Palette Index To Set (0-255))
+  dw 4 ; Value Buffer (Length: Number Of Palette Entries To Set (1-256))
+FB_PAL:
+  dw $FFFFFFFF, $FFFFFFFF, $FFFFFFFF, $FFFFFFFF ; RGBA Palette Values (Offset To Offset+Length-1)
+
+  dw Allocate_Buffer ; Tag Identifier
+  dw $00000008 ; Value Buffer Size In Bytes
+  dw $00000008 ; 1 bit (MSB) Request/Response Indicator (0=Request, 1=Response), 31 bits (LSB) Value Length In Bytes
 FB_POINTER:
-  dw 0 ; Frame Buffer Pointer (Set By GPU)
-  dw 0 ; Frame Buffer Size (Set By GPU)
-FB_PAL: ; Frame Buffer Palette
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
-  dh $FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF,$FFFF
+  dw 0 ; Value Buffer
+  dw 0 ; Value Buffer
+
+dw $00000000 ; $0 (End Tag)
+FB_STRUCT_END:
 
 align 32
 BIOS_STRUCT: ; Control Block Data Structure
@@ -158,10 +174,14 @@ CHAR_DEST:
   dw ((VSCREEN_X * (BITS_PER_PIXEL / 8)) - (CHAR_X * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw 0 ; DMA Next Control Block Address
 
-include 'CPU.ASM' ; CPU Instruction Table
+align 256
+CPU_INST:
+  include 'CPU.asm' ; CPU Instruction Table
 
 align 16
 GB_BIOS: file 'DMG_ROM.bin' ; Include Game Boy DMG BIOS ROM
+
+;GB_CART: file 'ROMS\HelloWorld.gb'
 
 GB_CART: file 'ROMS\cpu_instrs\01-special.gb' ; PASSED
 ;GB_CART: file 'ROMS\cpu_instrs\02-interrupts.gb' ; PASSED

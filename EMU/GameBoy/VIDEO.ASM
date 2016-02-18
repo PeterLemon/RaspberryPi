@@ -100,23 +100,16 @@ str r6,[FB_OFFSET_Y]
 
 ; Load Palette & Scroll Offset Values & Refresh Screen
 FB_Init:
-  imm32 r5,PERIPHERAL_BASE + MAIL_BASE
-  imm32 r6,FB_STRUCT
-  orr r6,MAIL_FB
-  str r6,[r5,MAIL_WRITE] ; Mail Box Write
+  imm32 r5,FB_STRUCT + MAIL_TAGS
+  imm32 r6,PERIPHERAL_BASE + MAIL_BASE + MAIL_WRITE + MAIL_TAGS
+  str r5,[r6] ; Mail Box Write
 
-  FB_Read:
-    ldr r6,[r5,MAIL_READ]
-    tst r6,MAIL_FB ; Test Frame Buffer Channel 1
-    beq FB_Read ; Wait For Frame Buffer Channel 1 Data
-
-  imm32 r5,FB_POINTER
-  ldr r12,[r5] ; R12 = Frame Buffer Pointer
+  ldr r12,[FB_POINTER] ; R12 = Frame Buffer Pointer
   cmp r12,0 ; Compare Frame Buffer Pointer to Zero
   beq FB_Init ; IF Zero Re-Initialize Frame Buffer
 
   and r12,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
-  str r12,[r5] ; Store Frame Buffer Pointer Physical Address
+  str r12,[FB_POINTER] ; Store Frame Buffer Pointer Physical Address
 
 ; Draw Characters
 mov r5,32 ; r5 = Number Of Characters To Display On Row
