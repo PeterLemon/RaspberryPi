@@ -78,13 +78,13 @@ DMABiosWait:
   bne DMABiosWait ; Wait Until DMA Has Finished
 
 Refresh: ; Refresh At 60 Hz
-  mov r12,0 ; R12 = QCycles
-  imm16 r11,$4444 ; 4194304 Hz / 60 Hz = 69905 CPU Cycles / 4 = 17476 Quad Cycles
-  imm32 r10,MEM_MAP ; R10 = MEM_MAP
   imm32 r9,CPU_INST ; R9 = CPU Instruction Table
+  imm32 r10,MEM_MAP ; R10 = MEM_MAP
+  imm16 r11,$4444 ; R11 = Quad Cycles Refresh Rate (4194304 Hz / 60 Hz = 69905 CPU Cycles / 4 = 17476 Quad Cycles)
+  mov r12,0 ; R12 = Reset QCycles
   CPU_EMU:
     ldrb r5,[r10,r4] ; R5 = CPU Instruction
-    add r5,r9,r5,lsl 7 ; R5 = CPU Instruction Table Opcode
+    ldr r5,[r9,r5,lsl 2] ; R5 = CPU Instruction Table Opcode
     add r4,1 ; PC_REG++
     blx r5 ; Run CPU Instruction
 
@@ -174,7 +174,14 @@ CHAR_DEST:
   dw ((VSCREEN_X * (BITS_PER_PIXEL / 8)) - (CHAR_X * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw 0 ; DMA Next Control Block Address
 
-align 128
+LCDQCycles: dw 0 ; LCD Quad Cycle Count
+DIVQCycles: dw 0 ; Divider Register Quad Cycle Count
+OldQCycles: dw 0 ; Previous Quad Cycle Count
+OldMode: dw 0 ; Previous LCD STAT Mode
+OldTAC_REG: dw 4 ; Previous TAC_REG (4096Hz)
+TimerQCycles: dw 0 ; Timer Quad Cycles
+IME_FLAG: dw 0 ; (IME) Interrupt Master Enable Flag (0 = Disable Interrupts, 1 = Enable Interrupts, Enabled In IE Register)
+
 CPU_INST:
   include 'CPU.asm' ; CPU Instruction Table
 
@@ -196,11 +203,4 @@ GB_CART: file 'ROMS\cpu_instrs\01-special.gb' ; PASSED
 ;GB_CART: file 'ROMS\cpu_instrs\11-op a,(hl).gb' ; PASSED
 ;GB_CART: file 'ROMS\instr_timing.gb' ; PASSED
 
-LCDQCycles: dw 0 ; LCD Quad Cycle Count
-DIVQCycles: dw 0 ; Divider Register Quad Cycle Count
-OldQCycles: dw 0 ; Previous Quad Cycle Count
-OldMode: dw 0 ; Previous LCD STAT Mode
-OldTAC_REG: dw 4 ; Previous TAC_REG (4096Hz)
-TimerQCycles: dw 0 ; Timer Quad Cycles
-IME_FLAG: dw 0 ; (IME) Interrupt Master Enable Flag (0 = Disable Interrupts, 1 = Enable Interrupts, Enabled In IE Register)
 MEM_MAP: ; Memory Map = $10000 Bytes
