@@ -20,7 +20,7 @@ org $0000
 
 ; Return CPU ID (0..3) Of The CPU Executed On
 mrs x0,MPIDR_EL1 ; X0 = Multiprocessor Affinity Register (MPIDR)
-ands x0,x0,3 ; R0 = CPU ID (Bits 0..1)
+ands x0,x0,3 ; X0 = CPU ID (Bits 0..1)
 b.ne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
 FB_Init:
