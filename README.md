@@ -23,7 +23,8 @@ http://gbadev.org<br />
 http://forum.gbadev.org<br />
 <br />
 Howto Compile:<br />
-All the code compiles into a single binary (kernel.img for Raspberry Pi, kernel7.img for Raspberry Pi 2 or kernel8.img for Raspberry Pi 3) file.<br />
+All the code compiles into a single binary (kernel.img for Raspberry Pi, kernel7.img for Raspberry Pi 2<br />
+or kernel8.img for Raspberry Pi 3) file.<br />
 Using FASMARM open up kernel.asm for Raspberry Pi, kernel7.asm for Raspberry Pi 2 or kernel8.asm for Raspberry Pi 3 & click the Run/Compile button.<br />
 <br />
 Howto Run:<br />
@@ -43,7 +44,8 @@ framebuffer_swap=0<br />
 Check http://www.raspberrypi.org/documentation/configuration/config-txt.md for more info about config options.<br />
 Check https://github.com/PeterLemon/RaspberryPi/tree/master/boot for the config.txt file.<br />
 <br />
-Once you have all these files ready, you can copy them & a kernel.img (Raspberry Pi), a kernel7.img (Raspberry Pi 2), or a kernel8.img (Raspberry Pi 3) file to the root of an SD card.<br />
+Once you have all these files ready, you can copy them & a kernel.img (Raspberry Pi), a kernel7.img (Raspberry Pi 2)<br />
+or a kernel8.img (Raspberry Pi 3) file to the root of an SD card.<br />
 <br />
 All of my demos use a maximum resolution of 640x480, they have been tested using composite & HDMI.<br />
 <br />
