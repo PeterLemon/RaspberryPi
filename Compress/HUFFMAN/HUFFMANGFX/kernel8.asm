@@ -32,7 +32,7 @@ FB_Init:
   adr x2,FB_POINTER
   str w1,[x2] ; Store Frame Buffer Pointer Physical Address
 
-adr x0,Huff ; X0 = Source Address, R1 = Destination Address
+adr x0,Huff ; X0 = Source Address, X1 = Destination Address
 
 ldr w2,[x0],4 ; W2 = Data Length & Header Info
 lsr w2,w2,8 ; W2 = Data Length
@@ -72,7 +72,7 @@ HuffChunkLoop:
       add w9,w9,w7 ; W9 = Node0 Child Offset
 
       tst w4,w5 ; Test Node Bit (0 = Node0, 1 = Node1)
-      lsr w5,w5,1 ; Shift R5 To Next Node Bit
+      lsr w5,w5,1 ; Shift W5 To Next Node Bit
       b.eq HuffNode0
       add w9,w9,1 ; W9 = Node1 Child Offset
       mov w10,$40 ; W10 = Test Node1 End Flag
