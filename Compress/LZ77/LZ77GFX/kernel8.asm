@@ -53,21 +53,21 @@ LZLoop:
     b LZBlockLoop
 
     LZDecode:
-	ldrb w5,[x0],1 ; W5 = Number Of Bytes To Copy & Disp MSB's
-	ldrb w6,[x0],1 ; W6 = Disp LSB's
-	add w6,w6,w5,lsl 8
-	lsr w5,w5,4 ; W5 = Number Of Bytes To Copy (Minus 3)
-	add w5,w5,3 ; W5 = Number Of Bytes To Copy
-	and w6,w6,$FFF ; W6 = Disp
-	add w6,w6,1 ; W6 = Disp + 1
-	sub w6,w1,w6 ; W6 = Destination - Disp - 1
-	LZCopy:
-	  ldrb w7,[x6],1 ; W7 = Byte To Copy
-	  strb w7,[x1],1 ; Store Byte To RAM
-	  subs w5,w5,1 ; Number Of Bytes To Copy -= 1
-	  b.ne LZCopy ; IF (Number Of Bytes To Copy != 0) LZCopy Bytes
-	  b LZBlockLoop
-  LZEnd:
+      ldrb w5,[x0],1 ; W5 = Number Of Bytes To Copy & Disp MSB's
+      ldrb w6,[x0],1 ; W6 = Disp LSB's
+      add w6,w6,w5,lsl 8
+      lsr w5,w5,4 ; W5 = Number Of Bytes To Copy (Minus 3)
+      add w5,w5,3 ; W5 = Number Of Bytes To Copy
+      and w6,w6,$FFF ; W6 = Disp
+      add w6,w6,1 ; W6 = Disp + 1
+      sub w6,w1,w6 ; W6 = Destination - Disp - 1
+      LZCopy:
+        ldrb w7,[x6],1 ; W7 = Byte To Copy
+        strb w7,[x1],1 ; Store Byte To RAM
+        subs w5,w5,1 ; Number Of Bytes To Copy -= 1
+        b.ne LZCopy ; IF (Number Of Bytes To Copy != 0) LZCopy Bytes
+        b LZBlockLoop
+    LZEnd:
 
 Loop:
   b Loop
