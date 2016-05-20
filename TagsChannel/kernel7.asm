@@ -2,7 +2,8 @@
 ; 1. Run Tags & Populate Values
 ; 2. Setup Frame Buffer
 ; 3. Copy Tags Value HEX Characters To Frame Buffer Using CPU
-      macro PrintValueBE Value, ValueLength {
+
+macro PrintValueBE Value, ValueLength {
   local .DrawHEXChars,.DrawHEXChar,.DrawHEXCharB
   imm32 r1,Font ; R1 = Characters
   imm32 r2,Value ; R2 = Text Offset
@@ -49,6 +50,7 @@
     add r0,CHAR_X ; Jump Forward 1 Char
     bne .DrawHEXChars ; IF (Number Of Hex Characters != 0) Continue To Print Characters
 }
+
 macro PrintText Text, TextLength {
   local .DrawChars,.DrawChar
   imm32 r1,Font ; R1 = Characters
