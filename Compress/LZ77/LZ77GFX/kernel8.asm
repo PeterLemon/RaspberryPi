@@ -29,8 +29,8 @@ FB_Init:
   cbz w1,FB_Init ; IF (Frame Buffer Pointer == Zero) Re-Initialize Frame Buffer
 
   and w1,w1,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
-  adr x2,FB_POINTER
-  str w1,[x2] ; Store Frame Buffer Pointer Physical Address
+  adr x0,FB_POINTER
+  str w1,[x0] ; Store Frame Buffer Pointer Physical Address
 
 adr x0,LZ ; X0 = Source Address, X1 = Destination Address
 
@@ -62,11 +62,11 @@ LZLoop:
       add w6,w6,1 ; W6 = Disp + 1
       sub w6,w1,w6 ; W6 = Destination - Disp - 1
       LZCopy:
-        ldrb w7,[x6],1 ; W7 = Byte To Copy
-        strb w7,[x1],1 ; Store Byte To RAM
-        subs w5,w5,1 ; Number Of Bytes To Copy -= 1
-        b.ne LZCopy ; IF (Number Of Bytes To Copy != 0) LZCopy Bytes
-        b LZBlockLoop
+	ldrb w7,[x6],1 ; W7 = Byte To Copy
+	strb w7,[x1],1 ; Store Byte To RAM
+	subs w5,w5,1 ; Number Of Bytes To Copy -= 1
+	b.ne LZCopy ; IF (Number Of Bytes To Copy != 0) LZCopy Bytes
+	b LZBlockLoop
     LZEnd:
 
 Loop:

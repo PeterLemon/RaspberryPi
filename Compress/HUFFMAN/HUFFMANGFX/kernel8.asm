@@ -29,8 +29,8 @@ FB_Init:
   cbz w1,FB_Init ; IF (Frame Buffer Pointer == Zero) Re-Initialize Frame Buffer
 
   and w1,w1,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
-  adr x2,FB_POINTER
-  str w1,[x2] ; Store Frame Buffer Pointer Physical Address
+  adr x0,FB_POINTER
+  str w1,[x0] ; Store Frame Buffer Pointer Physical Address
 
 adr x0,Huff ; X0 = Source Address, X1 = Destination Address
 
