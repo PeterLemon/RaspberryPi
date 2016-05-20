@@ -193,5 +193,7 @@ FB_POINTER:
 dw $00000000 ; $0 (End Tag)
 FB_STRUCT_END:
 
-LZVideo: file 'Video.lz'
 GRB:
+db 100800 dup 0 ; Fill with 100800 Zero Bytes
+
+LZVideo: file 'Video.lz'
