@@ -105,8 +105,8 @@ FB_Init:
   cbz w10,FB_Init ; IF (Frame Buffer Pointer == Zero) Re-Initialize Frame Buffer
 
   and w10,w10,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
-  adr x1,FB_POINTER
-  str w10,[x1] ; Store Frame Buffer Pointer Physical Address
+  adr x0,FB_POINTER
+  str w10,[x0] ; Store Frame Buffer Pointer Physical Address
 
 ; Return CPU ID (0..3) Of The CPU Executed On
 mrs x0,MPIDR_EL1 ; X0 = Multiprocessor Affinity Register (MPIDR)
