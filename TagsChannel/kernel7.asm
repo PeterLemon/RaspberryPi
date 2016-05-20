@@ -3,54 +3,6 @@
 ; 2. Setup Frame Buffer
 ; 3. Copy Tags Value HEX Characters To Frame Buffer Using CPU
 
-macro PrintValueBE Value, ValueLength {
-  local .DrawHEXChars,.DrawHEXChar,.DrawHEXCharB
-  imm32 r1,Font ; R1 = Characters
-  imm32 r2,Value ; R2 = Text Offset
-  mov r3,ValueLength ; R3 = Number Of HEX Characters To Print
-  .DrawHEXChars:
-    ldrb r4,[r2],1 ; R4 = Next 2 HEX Characters
-    mov r5,r4,lsr 4 ; Get 2nd Nibble
-    cmp r5,$9
-    addle r5,$30
-    addgt r5,$37
-    add r5,r1,r5,lsl 6 ; Add Shift To Correct Position In Font (* 64)
-    mov r6,CHAR_Y ; R6 = Character Row Counter
-    .DrawHEXChar:
-      ldr r7,[r5],4 ; Load Font Text Character 1/2 Row
-      str r7,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
-      ldr r7,[r5],4 ; Load Font Text Character 1/2 Row
-      str r7,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
-      add r0,SCREEN_X ; Jump Down 1 Scanline
-      sub r0,CHAR_X ; Jump Back 1 Char
-      subs r6,1 ; Decrement Character Row Counter
-      bne .DrawHEXChar ; IF (Character Row Counter != 0) DrawChar
-
-    sub r0,SCREEN_X * CHAR_Y ; Jump To Top Of Char
-
-    add r0,CHAR_X ; Jump Forward 1 Char
-    and r5,r4,$F ; Get 1st Nibble
-    cmp r5,$9
-    addle r5,$30
-    addgt r5,$37
-    add r5,r1,r5,lsl 6 ; Add Shift To Correct Position In Font (* 64)
-    mov r6,CHAR_Y ; R6 = Character Row Counter
-    .DrawHEXCharB:
-      ldr r7,[r5],4 ; Load Font Text Character 1/2 Row
-      str r7,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
-      ldr r7,[r5],4 ; Load Font Text Character 1/2 Row
-      str r7,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
-      add r0,SCREEN_X ; Jump Down 1 Scanline
-      sub r0,CHAR_X ; Jump Back 1 Char
-      subs r6,1 ; Decrement Character Row Counter
-      bne .DrawHEXCharB ; IF (Character Row Counter != 0) DrawChar
-
-    subs r3,1 ; Subtract Number Of HEX Characters To Print
-    sub r0,SCREEN_X * CHAR_Y ; Jump To Top Of Char
-    add r0,CHAR_X ; Jump Forward 1 Char
-    bne .DrawHEXChars ; IF (Number Of Hex Characters != 0) Continue To Print Characters
-}
-
 macro PrintText Text, TextLength {
   local .DrawChars,.DrawChar
   imm32 r1,Font ; R1 = Characters
