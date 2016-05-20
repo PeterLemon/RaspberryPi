@@ -39,7 +39,7 @@ macro PrintValueLE Value, ValueLength {
   mov r6,ValueLength ; R6 = Number Of HEX Characters To Print
   .DrawHEXChars:
     ldrb r7,[r2],-1 ; R7 = Next 2 HEX Characters
-    mov r8,r7,lsr 4 ; Get 2nd Nibble
+    lsr r8,r7,4 ; Get 2nd Nibble
     cmp r8,$9
     addle r8,$30
     addgt r8,$37
