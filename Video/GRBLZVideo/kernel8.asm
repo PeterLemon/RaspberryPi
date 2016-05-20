@@ -34,8 +34,8 @@ FB_Init:
   cbz w13,FB_Init ; IF (Frame Buffer Pointer == Zero) Re-Initialize Frame Buffer
 
   and w13,w13,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
-  adr x1,FB_POINTER
-  str w13,[x1] ; Store Frame Buffer Pointer Physical Address
+  adr x0,FB_POINTER
+  str w13,[x0] ; Store Frame Buffer Pointer Physical Address
 
 LoopVideo:
   adr x0,LZVideo ; X0 = Source Address
