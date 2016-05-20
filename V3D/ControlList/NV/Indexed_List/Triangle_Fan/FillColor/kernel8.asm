@@ -42,8 +42,8 @@ FB_Init:
   cbz w0,FB_Init ; IF (Frame Buffer Pointer == Zero) Re-Initialize Frame Buffer
 
   and w0,w0,$3FFFFFFF ; Convert Mail Box Frame Buffer Pointer From BUS Address To Physical Address ($CXXXXXXX -> $3XXXXXXX)
-  adr x2,FB_POINTER
-  str w0,[x2] ; Store Frame Buffer Pointer Physical Address
+  adr x1,FB_POINTER
+  str w0,[x1] ; Store Frame Buffer Pointer Physical Address
 
 adr x1,TILE_MODE_ADDRESS + 1 ; Store Frame Buffer Pointer To Control List Tile Rendering Mode Configuration Memory Address
 strb w0,[x1],1
