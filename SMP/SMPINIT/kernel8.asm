@@ -250,7 +250,7 @@ and x0,x0,3 ; X0 = CPU ID (Bits 0..1)
 adr x1,Core1SMPReturnCPUIDValue
 strb x0,[x1] ; Store CPU ID
 
-mov w1,104 ; (SCREEN_X * 104)
+mov w1,104 ; 16 + (SCREEN_X * 104)
 mov w2,SCREEN_X
 mul w1,w1,w2
 add w1,w1,16
