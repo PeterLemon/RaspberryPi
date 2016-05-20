@@ -1,76 +1,81 @@
 ; Raspberry Pi 2 'Bare Metal' V3D Initialize Demo by krom (Peter Lemon):
 ; 1. Run Tags & Set V3D Frequency To 250MHz, & Enable Quad Processing Unit
 ; 2. Setup Frame Buffer
-; 3. Copy V3D Readable Register Values To Frame Buffer Using DMA 2D Mode & Stride
+; 3. Copy V3D Readable Register Values To Frame Buffer Using CPU
 
 macro PrintText Text, TextLength {
-  local .DrawChars,.DMAWait
+  local .DrawChars,.DrawChar
   imm32 r1,Font ; R1 = Characters
   imm32 r2,Text ; R2 = Text Offset
-  imm32 r3,CB_STRUCT ; R3 = Control Block Data
-  imm32 r4,PERIPHERAL_BASE + DMA0_BASE ; R4 = DMA 0 Base
-  mov r5,DMA_ACTIVE ; R5 = DMA Active Bit
-  mov r6,TextLength ; R6 = Number Of Text Characters To Print
+  mov r3,TextLength ; R3 = Number Of Text Characters To Print
   .DrawChars:
-    ldrb r7,[r2],1 ; R7 = Next Text Character
-    add r7,r1,r7,lsl 6 ; Add Shift To Correct Position In Font (* 64)
-    str r7,[r3,CB_SOURCE - CB_STRUCT] ; Store DMA Source Address
-    str r0,[r3,CB_DEST - CB_STRUCT] ; Store DMA Destination Address
-    str r3,[r4,DMA_CONBLK_AD] ; Store DMA Control Block Data Address
-    str r5,[r4,DMA_CS] ; Print Next Text Character To Screen
-    .DMAWait:
-      ldr r7,[r4,DMA_CS] ; Load Control Block Status
-      tst r7,r5 ; Test Active Bit
-      bne .DMAWait ; Wait Until DMA Has Finished
+    mov r4,CHAR_Y ; R4 = Character Row Counter
+    ldrb r5,[r2],1 ; R5 = Next Text Character
+    add r5,r1,r5,lsl 6 ; Add Shift To Correct Position In Font (* 64)
 
-    subs r6,1 ; Subtract Number Of Text Characters To Print
+    .DrawChar:
+      ldr r6,[r5],4 ; Load Font Text Character 1/2 Row
+      str r6,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
+      ldr r6,[r5],4 ; Load Font Text Character 1/2 Row
+      str r6,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
+      add r0,SCREEN_X ; Jump Down 1 Scanline
+      sub r0,CHAR_X ; Jump Back 1 Char
+      subs r4,1 ; Decrement Character Row Counter
+      bne .DrawChar ; IF (Character Row Counter != 0) DrawChar
+
+    subs r3,1 ; Subtract Number Of Text Characters To Print
+    sub r0,SCREEN_X * CHAR_Y ; Jump To Top Of Char
     add r0,CHAR_X ; Jump Forward 1 Char
-    bne .DrawChars ; Continue To Print Characters
+    bne .DrawChars ; IF (Number Of Text Characters != 0) Continue To Print Characters
 }
 
 macro PrintValueLE Value, ValueLength {
-  local .DrawHEXChars,.DMAHEXWait,.DMAHEXWaitB
+  local .DrawHEXChars,.DrawHEXChar,.DrawHEXCharB
   imm32 r1,Font ; R1 = Characters
   imm32 r2,Value ; R2 = Text Offset
   add r2,ValueLength - 1
-  imm32 r3,CB_STRUCT ; R3 = Control Block Data
-  imm32 r4,PERIPHERAL_BASE + DMA0_BASE ; R4 = DMA 0 Base
-  mov r5,DMA_ACTIVE ; R5 = DMA Active Bit
-  mov r6,ValueLength ; R6 = Number Of HEX Characters To Print
+  mov r3,ValueLength ; R3 = Number Of HEX Characters To Print
   .DrawHEXChars:
-    ldrb r7,[r2],-1 ; R7 = Next 2 HEX Characters
-    lsr r8,r7,4 ; Get 2nd Nibble
-    cmp r8,$9
-    addle r8,$30
-    addgt r8,$37
-    add r8,r1,r8,lsl 6 ; Add Shift To Correct Position In Font (* 64)
-    str r8,[r3,CB_SOURCE - CB_STRUCT] ; Store DMA Source Address
-    str r0,[r3,CB_DEST - CB_STRUCT] ; Store DMA Destination Address
-    str r3,[r4,DMA_CONBLK_AD] ; Store DMA Control Block Data Address
-    str r5,[r4,DMA_CS] ; Print Next Text Character To Screen
-    .DMAHEXWait:
-      ldr r8,[r4,DMA_CS] ; Load Control Block Status
-      tst r8,r5 ; Test Active Bit
-      bne .DMAHEXWait ; Wait Until DMA Has Finished
+    ldrb r4,[r2],-1 ; R4 = Next 2 HEX Characters
+    lsr r5,r4,4 ; Get 2nd Nibble
+    cmp r5,$9
+    addle r5,$30
+    addgt r5,$37
+    add r5,r1,r5,lsl 6 ; Add Shift To Correct Position In Font (* 64)
+    mov r6,CHAR_Y ; R6 = Character Row Counter
+    .DrawHEXChar:
+      ldr r7,[r5],4 ; Load Font Text Character 1/2 Row
+      str r7,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
+      ldr r7,[r5],4 ; Load Font Text Character 1/2 Row
+      str r7,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
+      add r0,SCREEN_X ; Jump Down 1 Scanline
+      sub r0,CHAR_X ; Jump Back 1 Char
+      subs r6,1 ; Decrement Character Row Counter
+      bne .DrawHEXChar ; IF (Character Row Counter != 0) DrawChar
+
+    sub r0,SCREEN_X * CHAR_Y ; Jump To Top Of Char
 
     add r0,CHAR_X ; Jump Forward 1 Char
-    and r8,r7,$F ; Get 1st Nibble
-    cmp r8,$9
-    addle r8,$30
-    addgt r8,$37
-    add r8,r1,r8,lsl 6 ; Add Shift To Correct Position In Font (* 64)
-    str r8,[r3,CB_SOURCE - CB_STRUCT] ; Store DMA Source Address
-    str r0,[r3,CB_DEST - CB_STRUCT] ; Store DMA Destination Address
-    str r3,[r4,DMA_CONBLK_AD] ; Store DMA Control Block Data Address
-    str r5,[r4,DMA_CS] ; Print Next Text Character To Screen
-    .DMAHEXWaitB:
-      ldr r8,[r4,DMA_CS] ; Load Control Block Status
-      tst r8,r5 ; Test Active Bit
-      bne .DMAHEXWaitB ; Wait Until DMA Has Finished
+    and r5,r4,$F ; Get 1st Nibble
+    cmp r5,$9
+    addle r5,$30
+    addgt r5,$37
+    add r5,r1,r5,lsl 6 ; Add Shift To Correct Position In Font (* 64)
+    mov r6,CHAR_Y ; R6 = Character Row Counter
+    .DrawHEXCharB:
+      ldr r7,[r5],4 ; Load Font Text Character 1/2 Row
+      str r7,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
+      ldr r7,[r5],4 ; Load Font Text Character 1/2 Row
+      str r7,[r0],4 ; Store Font Text Character 1/2 Row To Frame Buffer
+      add r0,SCREEN_X ; Jump Down 1 Scanline
+      sub r0,CHAR_X ; Jump Back 1 Char
+      subs r6,1 ; Decrement Character Row Counter
+      bne .DrawHEXCharB ; IF (Character Row Counter != 0) DrawChar
 
-    subs r6,1 ; Subtract Number Of HEX Characters To Print
+    subs r3,1 ; Subtract Number Of HEX Characters To Print
+    sub r0,SCREEN_X * CHAR_Y ; Jump To Top Of Char
     add r0,CHAR_X ; Jump Forward 1 Char
-    bne .DrawHEXChars ; Continue To Print Characters
+    bne .DrawHEXChars ; IF (Number Of Hex Characters != 0) Continue To Print Characters
 }
 
 format binary as 'img'
@@ -93,10 +98,6 @@ org $0000
 mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
 ands r0,3 ; R0 = CPU ID (Bits 0..1)
 bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
-
-imm32 r0,PERIPHERAL_BASE + DMA_ENABLE ; Set DMA Channel 0 Enable Bit
-mov r1,DMA_EN0
-str r1,[r0]
 
 ; Run Tags To Initialize V3D
 imm32 r0,PERIPHERAL_BASE + MAIL_BASE
@@ -2284,17 +2285,6 @@ TAGS_STRUCT: ; Mailbox Property Interface Buffer Structure
 
 dw $00000000 ; $0 (End Tag)
 TAGS_END:
-
-align 32
-CB_STRUCT: ; Control Block Data Structure
-  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
-CB_SOURCE:
-  dw 0 ; DMA Source Address
-CB_DEST:
-  dw 0 ; DMA Destination Address
-  dw CHAR_X + ((CHAR_Y - 1) * 65536) ; DMA Transfer Length
-  dw (SCREEN_X - CHAR_X) * 65536 ; DMA 2D Mode Stride
-  dw 0 ; DMA Next Control Block Address
 
 VCText: db "VideoCoreIV:"
 
