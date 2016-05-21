@@ -164,7 +164,7 @@ UpdateInput:
     b.ge LoopInputData ; Loop 8bit Data
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; R1 Now Contains Input Data ;;
+;; W1 Now Contains Input Data ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 adr x0,DataValue
 str w1,[x0]
