@@ -33,7 +33,8 @@ BITS_PER_PIXEL = 32
 
 org $0000
 
-imm32 r0,PERIPHERAL_BASE + DMA_ENABLE ; Set DMA Channel 0 Enable Bit
+; Set DMA Channel 0 Enable Bit
+imm32 r0,PERIPHERAL_BASE + DMA_ENABLE
 mov r1,DMA_EN0
 str r1,[r0]
 

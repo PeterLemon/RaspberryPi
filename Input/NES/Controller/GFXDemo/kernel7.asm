@@ -38,7 +38,8 @@ mrc p15,0,r0,c0,c0,5 ; R0 = Multiprocessor Affinity Register (MPIDR)
 ands r0,3 ; R0 = CPU ID (Bits 0..1)
 bne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
-imm32 r0,PERIPHERAL_BASE + DMA_ENABLE ; Set DMA Channel 0 Enable Bit
+; Set DMA Channel 0 Enable Bit
+imm32 r0,PERIPHERAL_BASE + DMA_ENABLE
 mov r1,DMA_EN0
 str r1,[r0]
 
