@@ -170,7 +170,7 @@ adr x0,DataValue
 str w1,[x0]
 
 adr x1,FB_POINTER
-ldr w0,[x1] ; R0 = Frame Buffer Pointer
+ldr w0,[x1] ; W0 = Frame Buffer Pointer
 mov w1,(320 * 50) + 160
 add w0,w0,w1
 PrintTAGValueLE Text, 21, DataValue, 1
