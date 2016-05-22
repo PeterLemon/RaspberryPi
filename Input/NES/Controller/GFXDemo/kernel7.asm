@@ -57,15 +57,14 @@ FB_Init:
 ; Set Control Block Data Destination Address
 str r0,[SCRBUF_DEST]
 
-; Set Control Block Data Address into the DMA controller
-adr r0,BG_STRUCT
-imm32 r1,PERIPHERAL_BASE + DMA0_BASE + DMA_CONBLK_AD
-str r0,[r1]
+; Set Control Block Data Address To DMA Channel 0 Controller
+imm32 r0,PERIPHERAL_BASE + DMA0_BASE
+adr r1,BG_STRUCT
+str r1,[r0,DMA_CONBLK_AD]
 
 ; Set Start Bit
-mov r0,DMA_ACTIVE
-imm32 r1,PERIPHERAL_BASE + DMA0_BASE + DMA_CS
-str r0,[r1]
+mov r1,DMA_ACTIVE
+str r1,[r0,DMA_CS] ; Start DMA
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize Input ;;
