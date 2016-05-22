@@ -41,7 +41,8 @@ POINTER_CENTER_Y = (SCREEN_Y / 2) - (POINTER_Y / 2)
 
 org $0000
 
-imm32 r0,PERIPHERAL_BASE + DMA_ENABLE ; Set DMA Channel 0 Enable Bit
+; Set DMA Channel 0 Enable Bit
+imm32 r0,PERIPHERAL_BASE + DMA_ENABLE
 mov r1,DMA_EN0
 str r1,[r0]
 
@@ -60,15 +61,14 @@ FB_Init:
 ; Set Control Block Data Destination Address
 str r0,[SCRBUF_DEST]
 
-; Set Control Block Data Address into the DMA controller
-adr r0,BG_STRUCT
-imm32 r1,PERIPHERAL_BASE + DMA0_BASE + DMA_CONBLK_AD
-str r0,[r1]
+; Set Control Block Data Address To DMA Channel 0 Controller
+imm32 r0,PERIPHERAL_BASE + DMA0_BASE
+adr r1,BG_STRUCT
+str r1,[r0,DMA_CONBLK_AD]
 
 ; Set Start Bit
-mov r0,DMA_ACTIVE
-imm32 r1,PERIPHERAL_BASE + DMA0_BASE + DMA_CS
-str r0,[r1]
+mov r1,DMA_ACTIVE
+str r1,[r0,DMA_CS] ; Start DMA
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize Input ;;
@@ -189,20 +189,20 @@ and r1,MOUSE_R + MOUSE_L ; Get Button State
 
 cmp r1,0 ; Test No Mouse L & R Button
 imm32eq r0,Pointer_Image
-beq ButtonComplete
+beq ButtonEnd
 
 cmp r1,MOUSE_L ; Test Mouse L Button
 imm32eq r0,PointerL_Image
-beq ButtonComplete
+beq ButtonEnd
 
 cmp r1,MOUSE_R ; Test Mouse R Button
 imm32eq r0,PointerR_Image
-beq ButtonComplete
+beq ButtonEnd
 
 cmp r1,MOUSE_R + MOUSE_L ; Test Mouse L & R Button
 imm32eq r0,PointerLR_Image
 
-ButtonComplete:
+ButtonEnd:
 str r0,[POINTER_SOURCE]
 
 b UpdateInput ; Refresh Input Data
