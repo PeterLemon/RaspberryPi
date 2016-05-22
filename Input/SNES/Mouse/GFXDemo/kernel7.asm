@@ -17,27 +17,23 @@ include 'LIB\FASMARM.INC'
 include 'LIB\R_PI2.INC'
 
 ; Setup Input
-MOUSE_R      = 00000000100000000000000000000000b
-MOUSE_L      = 00000000010000000000000000000000b
-MOUSE_SPDSLW = 00000000001000000000000000000000b
-MOUSE_SPDNOR = 00000000000100000000000000000000b
-MOUSE_SPDFST = 00000000000000000000000000000000b
-MOUSE_SIG    = 00000000000011110000000000000000b ; Always %0001
-MOUSE_DIRY   = 00000000000000001000000000000000b
-MOUSE_Y      = 00000000000000000111111100000000b
-MOUSE_DIRX   = 00000000000000000000000010000000b
-MOUSE_X      = 00000000000000000000000001111111b
+JOY_R	   = 0000000000010000b
+JOY_L	   = 0000000000100000b
+JOY_X	   = 0000000001000000b
+JOY_A	   = 0000000010000000b
+JOY_RIGHT  = 0000000100000000b
+JOY_LEFT   = 0000001000000000b
+JOY_DOWN   = 0000010000000000b
+JOY_UP	   = 0000100000000000b
+JOY_START  = 0001000000000000b
+JOY_SELECT = 0010000000000000b
+JOY_Y	   = 0100000000000000b
+JOY_B	   = 1000000000000000b
 
 ; Setup Frame Buffer
 SCREEN_X       = 640
 SCREEN_Y       = 480
 BITS_PER_PIXEL = 32
-
-; Setup Pointer
-POINTER_X = 96
-POINTER_Y = 144
-POINTER_CENTER_X = (SCREEN_X / 2) - (POINTER_X / 2)
-POINTER_CENTER_Y = (SCREEN_Y / 2) - (POINTER_Y / 2)
 
 org $0000
 
@@ -97,7 +93,7 @@ UpdateInput:
   Delay 32
 
   mov r1,0  ; R1 = Input Data
-  mov r2,31 ; R2 = Input Data Count
+  mov r2,15 ; R2 = Input Data Count
   LoopInputData:
     ldr r3,[r0,GPIO_GPLEV0] ; Get GPIO 4 (Data) Level
     tst r3,GPIO_4
@@ -113,111 +109,68 @@ UpdateInput:
     Delay 32
 
     subs r2,1
-    bge LoopInputData ; Loop 32bit Data
+    bge LoopInputData ; Loop 16bit Data
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; R1 Now Contains Input Data ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-and r0,r1,$300000
-cmp r0,MOUSE_SPDFST ; Compare IF On "Fast" Speed Phase, Otherwise Update Input
-bne UpdateInput
+tst r1,JOY_L
+imm32ne r0,ButtonLPress
+imm32eq r0,ButtonL
+str r0,[ButtonL_SOURCE]
 
-ldr r0,[MOUSE_DATA] ; Compare Old & New Mouse XY Data, IF == Mouse Has Not Moved
-cmp r1,r0
-beq SkipXYPos
+tst r1,JOY_R
+imm32ne r0,ButtonRPress
+imm32eq r0,ButtonR
+str r0,[ButtonR_SOURCE]
 
-; Mouse X
-and r2,r0,$FF ; R2 = Old Mouse X Data
-and r3,r1,$FF ; R3 = New Mouse X Data
-cmp r2,r3 ; Compare Old & New Mouse X Data, IF == Mouse X Has Not Moved
-beq SkipXPos
+tst r1,JOY_X
+imm32ne r0,ButtonXPress
+imm32eq r0,ButtonX
+str r0,[ButtonX_SOURCE]
 
-ldr r2,[MOUSE_X_POS] ; R2 = Mouse X Position
-ldr r3,[POINTER_DEST] ; R3 = Pointer VRAM Destination
+tst r1,JOY_A
+imm32ne r0,ButtonAPress
+imm32eq r0,ButtonA
+str r0,[ButtonA_SOURCE]
 
-tst r1,MOUSE_DIRX ; Test Mouse X Direction
-bne MouseXDir1
-cmp r2,SCREEN_X - POINTER_X ; Maximum X Test (Make Sure Pointer Does Not Go Off Screen Right)
-beq SkipXPos
-b MouseXDir0
+tst r1,JOY_B
+imm32ne r0,ButtonBPress
+imm32eq r0,ButtonB
+str r0,[ButtonB_SOURCE]
 
-MouseXDir1:
-cmp r2,0 ; Minimum X Test (Make Sure Pointer Does Not Go Off Screen Left)
-beq SkipXPos
-MouseXDir0:
+tst r1,JOY_Y
+imm32ne r0,ButtonYPress
+imm32eq r0,ButtonY
+str r0,[ButtonY_SOURCE]
 
-tst r1,MOUSE_DIRX ; Test Mouse X Direction
-addeq r2,1
-addeq r3,1 * (BITS_PER_PIXEL / 8)
-subne r2,1
-subne r3,1 * (BITS_PER_PIXEL / 8)
-str r2,[MOUSE_X_POS] ; Store Mouse X Position
-str r3,[POINTER_DEST] ; Store Pointer VRAM Destination
-SkipXPos:
+tst r1,JOY_START
+imm32ne r0,ButtonStartPress
+imm32eq r0,ButtonStart
+str r0,[ButtonStart_SOURCE]
 
-; Mouse Y
-mov r2,r0,lsr 8 ; R2 = Old Mouse Y Data
-and r2,$FF
-mov r3,r1,lsr 8 ; R3 = New Mouse Y Data
-and r3,$FF
-cmp r2,r3 ; Compare Old & New Mouse X Data, IF == Mouse X Has Not Moved
-beq SkipYPos
+tst r1,JOY_SELECT
+imm32ne r0,ButtonSelectPress
+imm32eq r0,ButtonSelect
+str r0,[ButtonSelect_SOURCE]
 
-ldr r2,[MOUSE_Y_POS] ; R2 = Mouse Y Position
-ldr r3,[POINTER_DEST] ; R3 = Pointer VRAM Destination
-
-tst r1,MOUSE_DIRY ; Test Mouse Y Direction
-bne MouseYDir1
-cmp r2,SCREEN_Y - POINTER_Y ; Maximum Y Test (Make Sure Pointer Does Not Go Off Screen Bottom)
-beq SkipYPos
-b MouseYDir0
-
-MouseYDir1:
-cmp r2,0 ; Minimum Y Test (Make Sure Pointer Does Not Go Off Screen Top)
-beq SkipYPos
-MouseYDir0:
-
-tst r1,MOUSE_DIRY ; Test Mouse Y Direction
-addeq r2,1
-addeq r3,SCREEN_X * (BITS_PER_PIXEL / 8)
-subne r2,1
-subne r3,SCREEN_X * (BITS_PER_PIXEL / 8)
-str r2,[MOUSE_Y_POS] ; Store Mouse Y Position
-str r3,[POINTER_DEST] ; Store Pointer VRAM Destination
-SkipYPos:
-
-str r1,[MOUSE_DATA]
-SkipXYPos:
-
-and r1,MOUSE_R + MOUSE_L ; Get Button State
-
-cmp r1,0 ; Test No Mouse L & R Button
-imm32eq r0,Pointer_Image
-beq ButtonEnd
-
-cmp r1,MOUSE_L ; Test Mouse L Button
-imm32eq r0,PointerL_Image
-beq ButtonEnd
-
-cmp r1,MOUSE_R ; Test Mouse R Button
-imm32eq r0,PointerR_Image
-beq ButtonEnd
-
-cmp r1,MOUSE_R + MOUSE_L ; Test Mouse L & R Button
-imm32eq r0,PointerLR_Image
-
-ButtonEnd:
-str r0,[POINTER_SOURCE]
+tst r1,JOY_UP + JOY_DOWN + JOY_LEFT + JOY_RIGHT
+imm32eq r0,Direction
+tst r1,JOY_UP
+imm32ne r0,DirectionUpPress
+tst r1,JOY_DOWN
+imm32ne r0,DirectionDownPress
+tst r1,JOY_LEFT
+imm32ne r0,DirectionLeftPress
+tst r1,JOY_RIGHT
+imm32ne r0,DirectionRightPress
+str r0,[Direction_SOURCE]
 
 b UpdateInput ; Refresh Input Data
 
 CoreLoop: ; Infinite Loop For Core 1..3
   b CoreLoop
-
-MOUSE_DATA: dw 0
-MOUSE_X_POS: dw POINTER_CENTER_X
-MOUSE_Y_POS: dw POINTER_CENTER_Y
 
 align 16
 FB_STRUCT: ; Mailbox Property Interface Buffer Structure
@@ -268,17 +221,96 @@ BG_DEST:
   dw Screen_Buffer ; DMA Destination Address
   dw SCREEN_X * SCREEN_Y * (BITS_PER_PIXEL / 8) ; DMA Transfer Length
   dw 0 ; DMA 2D Mode Stride
-  dw POINTER_STRUCT ; DMA Next Control Block Address
+  dw ButtonL_STRUCT ; DMA Next Control Block Address
 
 align 32
-POINTER_STRUCT: ; Control Block Data Structure
+ButtonL_STRUCT: ; Control Block Data Structure
   dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
-POINTER_SOURCE:
-  dw Pointer_Image ; DMA Source Address
-POINTER_DEST:
-  dw Screen_Buffer + (((SCREEN_X * POINTER_CENTER_Y) + POINTER_CENTER_X) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
-  dw (POINTER_X * (BITS_PER_PIXEL / 8)) + ((POINTER_Y - 1) * 65536) ; DMA Transfer Length
-  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (POINTER_X * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+ButtonL_SOURCE:
+  dw ButtonL ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 192) + 80) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (144 * (BITS_PER_PIXEL / 8)) + ((40 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (144 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw ButtonR_STRUCT ; DMA Next Control Block Address
+
+align 32
+ButtonR_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+ButtonR_SOURCE:
+  dw ButtonR ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 192) + 416) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (144 * (BITS_PER_PIXEL / 8)) + ((40 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (144 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw ButtonX_STRUCT ; DMA Next Control Block Address
+
+align 32
+ButtonX_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+ButtonX_SOURCE:
+  dw ButtonX ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 264) + 464) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (64 * (BITS_PER_PIXEL / 8)) + ((56 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw ButtonA_STRUCT ; DMA Next Control Block Address
+
+align 32
+ButtonA_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+ButtonA_SOURCE:
+  dw ButtonA ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 308) + 524) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (64 * (BITS_PER_PIXEL / 8)) + ((56 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw ButtonB_STRUCT ; DMA Next Control Block Address
+
+align 32
+ButtonB_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+ButtonB_SOURCE:
+  dw ButtonB ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 352) + 464) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (64 * (BITS_PER_PIXEL / 8)) + ((56 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw ButtonY_STRUCT ; DMA Next Control Block Address
+
+align 32
+ButtonY_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+ButtonY_SOURCE:
+  dw ButtonY ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 308) + 404) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (64 * (BITS_PER_PIXEL / 8)) + ((56 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (64 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw ButtonStart_STRUCT ; DMA Next Control Block Address
+
+align 32
+ButtonStart_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+ButtonStart_SOURCE:
+  dw ButtonStart ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 328) + 300) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (60 * (BITS_PER_PIXEL / 8)) + ((52 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (60 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw ButtonSelect_STRUCT ; DMA Next Control Block Address
+
+align 32
+ButtonSelect_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+ButtonSelect_SOURCE:
+  dw ButtonSelect ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 328) + 236) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (60 * (BITS_PER_PIXEL / 8)) + ((52 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (60 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
+  dw Direction_STRUCT ; DMA Next Control Block Address
+
+align 32
+Direction_STRUCT: ; Control Block Data Structure
+  dw DMA_TDMODE + DMA_DEST_INC + DMA_DEST_WIDTH + DMA_SRC_INC + DMA_SRC_WIDTH ; DMA Transfer Information
+Direction_SOURCE:
+  dw Direction ; DMA Source Address
+  dw Screen_Buffer + (((SCREEN_X * 272) + 76) * (BITS_PER_PIXEL / 8)) ; DMA Destination Address
+  dw (128 * (BITS_PER_PIXEL / 8)) + ((128 - 1) * 65536) ; DMA Transfer Length
+  dw ((SCREEN_X * (BITS_PER_PIXEL / 8)) - (128 * (BITS_PER_PIXEL / 8))) * 65536 ; DMA 2D Mode Stride
   dw SCRBUF_STRUCT ; DMA Next Control Block Address
 
 align 32
@@ -291,17 +323,56 @@ SCRBUF_DEST:
   dw 0 ; DMA 2D Mode Stride
   dw BG_STRUCT ; DMA Next Control Block Address
 
-Pointer_Image:
-  file 'Pointer.bin'
+ButtonL:
+  file 'ButtonL.bin'
+ButtonLPress:
+  file 'ButtonLPress.bin'
 
-PointerL_Image:
-  file 'PointerL.bin'
+ButtonR:
+  file 'ButtonR.bin'
+ButtonRPress:
+  file 'ButtonRPress.bin'
 
-PointerR_Image:
-  file 'PointerR.bin'
+ButtonX:
+  file 'ButtonX.bin'
+ButtonXPress:
+  file 'ButtonXPress.bin'
 
-PointerLR_Image:
-  file 'PointerLR.bin'
+ButtonA:
+  file 'ButtonA.bin'
+ButtonAPress:
+  file 'ButtonAPress.bin'
+
+ButtonB:
+  file 'ButtonB.bin'
+ButtonBPress:
+  file 'ButtonBPress.bin'
+
+ButtonY:
+  file 'ButtonY.bin'
+ButtonYPress:
+  file 'ButtonYPress.bin'
+
+ButtonStart:
+  file 'ButtonStart.bin'
+ButtonStartPress:
+  file 'ButtonStartPress.bin'
+
+ButtonSelect:
+  file 'ButtonSelect.bin'
+ButtonSelectPress:
+  file 'ButtonSelectPress.bin'
+
+Direction:
+  file 'Direction.bin'
+DirectionUpPress:
+  file 'DirectionUpPress.bin'
+DirectionDownPress:
+  file 'DirectionDownPress.bin'
+DirectionLeftPress:
+  file 'DirectionLeftPress.bin'
+DirectionRightPress:
+  file 'DirectionRightPress.bin'
 
 BG_Image:
   file 'BG.bin'
