@@ -1,8 +1,9 @@
 ; Raspberry Pi 2 'Bare Metal' Mandelbrot Fractal Demo by krom (Peter Lemon):
-; 1. Turn On L1 Cache
-; 2. Turn On Advanced SIMD & Vector Floating Point Unit (NEON MPE)
-; 3. Setup Frame Buffer
-; 4. Plot Fractal Using Single-Precision
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Turn On L1 Cache
+; 3. Turn On Advanced SIMD & Vector Floating Point Unit (NEON MPE)
+; 4. Setup Frame Buffer
+; 5. Plot Fractal Using Single-Precision
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
