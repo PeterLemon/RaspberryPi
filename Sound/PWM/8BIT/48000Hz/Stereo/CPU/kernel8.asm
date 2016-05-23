@@ -1,7 +1,8 @@
 ; Raspberry Pi 3 'Bare Metal' Sound 8Bit Stereo 48000Hz CPU Demo by krom (Peter Lemon):
-; 1. Set 3.5" Phone Jack To PWM 
-; 2. Setup PWM Sound Buffer
-; 3. Play Sound Sample Using CPU & FIFO
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Set 3.5" Phone Jack To PWM 
+; 3. Setup PWM Sound Buffer
+; 4. Play Sound Sample Using CPU & FIFO
 
 code64
 processor cpu64_v8

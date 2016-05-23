@@ -1,9 +1,10 @@
 ; Raspberry Pi 3 'Bare Metal' Sound 8Bit Mono 48000Hz DMA Demo by krom (Peter Lemon):
-; 1. Convert Sample To DMA
-; 2. Set 3.5" Phone Jack To PWM
-; 3. Setup PWM Sound Buffer
-; 4. Setup DMA & DREQ
-; 5. Play Sound Sample Using DMA & FIFO
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Convert Sample To DMA
+; 3. Set 3.5" Phone Jack To PWM
+; 4. Setup PWM Sound Buffer
+; 5. Setup DMA & DREQ
+; 6. Play Sound Sample Using DMA & FIFO
 
 code64
 processor cpu64_v8
