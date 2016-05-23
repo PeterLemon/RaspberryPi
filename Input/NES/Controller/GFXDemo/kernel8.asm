@@ -1,8 +1,9 @@
 ; Raspberry Pi 3 'Bare Metal' Input NES Controller GFX Demo by krom (Peter Lemon):
-; 1. Setup Frame Buffer
-; 2. Start DMA 0 To Loop DMA Control Blocks For Fast Screen Buffer
-; 3. Initialize & Update Input Data
-; 4. Show GFX Representation Of Input Device 
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Setup Frame Buffer
+; 3. Start DMA 0 To Loop DMA Control Blocks For Fast Screen Buffer
+; 4. Initialize & Update Input Data
+; 5. Show GFX Representation Of Input Device 
 
 macro Delay amount {
   local .DelayLoop

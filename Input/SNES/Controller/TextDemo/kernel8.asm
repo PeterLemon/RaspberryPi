@@ -1,7 +1,8 @@
 ; Raspberry Pi 3 'Bare Metal' Input SNES Controller Text Demo by krom (Peter Lemon):
-; 1. Setup Frame Buffer
-; 2. Initialize & Update Input Data
-; 3. Print RAW Hex Values To Screen
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Setup Frame Buffer
+; 3. Initialize & Update Input Data
+; 4. Print RAW Hex Values To Screen
 
 macro PrintText Text, TextLength {
   local .DrawChars,.DrawChar
