@@ -1,6 +1,6 @@
 ; Raspberry Pi 3 'Bare Metal' Julia Fractal Animation Demo by krom (Peter Lemon):
-; 1. Turn On L1 Cache
-; 2. Turn On Vector Floating Point Unit
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Turn On L1 Cache
 ; 3. Setup Frame Buffer
 ; 4. Plot Fractal Using Double-Precision
 ; 5. Change Julia Settings & Redraw To Animate

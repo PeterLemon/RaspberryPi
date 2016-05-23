@@ -1,9 +1,10 @@
 ; Raspberry Pi 2 'Bare Metal' Julia Fractal Animation Demo by krom (Peter Lemon):
-; 1. Turn On L1 Cache
-; 2. Turn On Vector Floating Point Unit
-; 3. Setup Frame Buffer
-; 4. Plot Fractal Using Single-Precision
-; 5. Change Julia Settings & Redraw To Animate
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Turn On L1 Cache
+; 3. Turn On Vector Floating Point Unit
+; 4. Setup Frame Buffer
+; 5. Plot Fractal Using Single-Precision
+; 6. Change Julia Settings & Redraw To Animate
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
