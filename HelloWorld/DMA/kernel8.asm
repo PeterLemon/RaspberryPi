@@ -1,6 +1,7 @@
 ; Raspberry Pi 3 'Bare Metal' Hello World DMA Demo by krom (Peter Lemon):
-; 1. Setup Frame Buffer
-; 2. Copy Hello World Text Characters To Frame Buffer Using DMA 2D Mode & Stride
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Setup Frame Buffer
+; 3. Copy Hello World Text Characters To Frame Buffer Using DMA 2D Mode & Stride
 
 code64
 processor cpu64_v8
