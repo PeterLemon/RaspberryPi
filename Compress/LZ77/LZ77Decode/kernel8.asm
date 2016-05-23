@@ -1,5 +1,6 @@
 ; Raspberry Pi 3 'Bare Metal' LZ77 Decode Demo by krom (Peter Lemon):
-; 1. Decode LZ77 Chunks To Memory
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Decode LZ77 Chunks To Memory
 
 code64
 processor cpu64_v8

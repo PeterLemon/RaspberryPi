@@ -1,6 +1,7 @@
 ; Raspberry Pi 3 'Bare Metal' LZ77 GFX Demo by krom (Peter Lemon):
-; 1. Setup Frame Buffer
-; 2. Decode LZ77 Chunks To Video Memory
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Setup Frame Buffer
+; 3. Decode LZ77 Chunks To Video Memory
 
 code64
 processor cpu64_v8

@@ -1,5 +1,6 @@
 ; Raspberry Pi 2 'Bare Metal' HUFFMAN Decode Demo by krom (Peter Lemon) & Andy Smith:
-; 1. Decode HUFFMAN Chunks To Memory
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Decode HUFFMAN Chunks To Memory
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'

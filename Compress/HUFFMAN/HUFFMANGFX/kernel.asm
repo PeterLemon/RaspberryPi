@@ -1,6 +1,6 @@
 ; Raspberry Pi 'Bare Metal' HUFFMAN GFX Demo by krom (Peter Lemon) & Andy Smith:
 ; 1. Setup Frame Buffer
-; 2. Decode HUFFMAN Chunks To Memory
+; 2. Decode HUFFMAN Chunks To Video Memory
 
 format binary as 'img'
 include 'LIB\FASMARM.INC'
