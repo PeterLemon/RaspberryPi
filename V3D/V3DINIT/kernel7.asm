@@ -1,7 +1,8 @@
 ; Raspberry Pi 2 'Bare Metal' V3D Initialize Demo by krom (Peter Lemon):
-; 1. Run Tags & Set V3D Frequency To 250MHz, & Enable Quad Processing Unit
-; 2. Setup Frame Buffer
-; 3. Copy V3D Readable Register Values To Frame Buffer Using CPU
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Run Tags & Set V3D Frequency To 250MHz, & Enable Quad Processing Unit
+; 3. Setup Frame Buffer
+; 4. Copy V3D Readable Register Values To Frame Buffer Using CPU
 
 macro PrintText Text, TextLength {
   local .DrawChars,.DrawChar

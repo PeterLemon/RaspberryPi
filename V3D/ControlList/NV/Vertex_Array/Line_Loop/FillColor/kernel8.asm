@@ -1,7 +1,8 @@
 ; Raspberry Pi 3 'Bare Metal' V3D Fill Color NV Vertex Array Line Loop Control List Demo by krom (Peter Lemon):
-; 1. Run Tags & Set V3D Frequency To 250MHz, & Enable Quad Processing Unit
-; 2. Setup Frame Buffer
-; 3. Setup & Run V3D Control List Rendered Tile Buffer
+; 1. Set Cores 1..3 To Infinite Loop
+; 2. Run Tags & Set V3D Frequency To 250MHz, & Enable Quad Processing Unit
+; 3. Setup Frame Buffer
+; 4. Setup & Run V3D Control List Rendered Tile Buffer
 
 code64
 processor cpu64_v8
