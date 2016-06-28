@@ -1900,7 +1900,7 @@ HEXA4:
   bx lr
 HEXA5:
   ; $A5 AND   L                Logical AND L With A
-  mov r5,r3,lsl 24             ; A_REG &= E_REG
+  mov r5,r3,lsl 24             ; A_REG &= L_REG
   mov r5,r5,lsr 16
   orr r5,$FF
   and r0,r5
