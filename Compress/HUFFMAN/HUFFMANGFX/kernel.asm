@@ -47,7 +47,7 @@ HuffChunkLoop:
     cmp r1,r2 ; IF (Destination Address == Destination End Offset) HuffEnd
     beq HuffEnd
 
-    cmp r5,0 ; IF (Node Bit Shifter == 0) HuffLoop
+    cmp r5,0 ; IF (Node Bit Shifter == 0) Huff Chunk Loop
     beq HuffChunkLoop
 
     ldrb r6,[r0,r9] ; R6 = Next Node
