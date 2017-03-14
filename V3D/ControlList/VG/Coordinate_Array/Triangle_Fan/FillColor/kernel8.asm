@@ -149,7 +149,7 @@ CONTROL_LIST_BIN_STRUCT: ; Control List Of Concatenated Control Records & Data S
   Configuration_Bits Enable_Forward_Facing_Primitive + Enable_Reverse_Facing_Primitive, Early_Z_Updates_Enable ; Configuration Bits
   Viewport_Offset 0, 0 ; Viewport Offset
   VG_Shader_State VG_SHADER_STATE_RECORD ; VG Shader State
-  VG_Coordinate_Array_Primitives Primitives_Type_Triangle_Fan, 4, VERTEX_DATA ; VG Coordinate Array Primitives (Only For Use In VG Shader Mode)
+  VG_Coordinate_Array_Primitives Primitives_Type_Triangle_Fan, 4, BUS_ADDRESSES_l2CACHE_DISABLED + VERTEX_DATA ; VG Coordinate Array Primitives (Only For Use In VG Shader Mode)
   Flush ; Flush (Add Return-From-Sub-List To Tile Lists & Then Flush Tile Lists To Memory) (B)
 CONTROL_LIST_BIN_END:
 
@@ -498,7 +498,7 @@ VG_SHADER_STATE_RECORD:
   db 0 ; Not Used
   db 0 ; Fragment Shader Number Of Uniforms (Not Used Currently)
   db 0 ; Fragment Shader Number Of Varyings
-  dw FRAGMENT_SHADER_CODE ; Fragment Shader Code Address
+  dw BUS_ADDRESSES_l2CACHE_DISABLED + FRAGMENT_SHADER_CODE ; Fragment Shader Code Address
   dw 0 ; Fragment Shader Uniforms Address
 
 align 16 ; 128-Bit Align
