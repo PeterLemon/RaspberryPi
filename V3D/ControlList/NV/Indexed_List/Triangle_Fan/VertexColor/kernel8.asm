@@ -498,9 +498,9 @@ NV_SHADER_STATE_RECORD:
   db 6 * 4 ; Shaded Vertex Data Stride
   db 0 ; Fragment Shader Number Of Uniforms (Not Used Currently)
   db 3 ; Fragment Shader Number Of Varyings
-  dw FRAGMENT_SHADER_CODE ; Fragment Shader Code Address
+  dw BUS_ADDRESSES_l2CACHE_DISABLED + FRAGMENT_SHADER_CODE ; Fragment Shader Code Address
   dw 0 ; Fragment Shader Uniforms Address
-  dw VERTEX_DATA ; Shaded Vertex Data Address (128-Bit Aligned If Including Clip Coordinate Header)
+  dw BUS_ADDRESSES_l2CACHE_DISABLED + VERTEX_DATA ; Shaded Vertex Data Address (128-Bit Aligned If Including Clip Coordinate Header)
 
 align 16 ; 128-Bit Align
 VERTEX_LIST:
