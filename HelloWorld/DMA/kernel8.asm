@@ -49,6 +49,9 @@ add w0,w0,w1 ; Place Text At XY Position 256,32
 adr x1,Font ; X1 = Characters
 adr x2,Text ; X2 = Text Offset
 adr x3,CB_STRUCT ; X3 = Control Block Data
+mov w4,BUS_ADDRESSES_l2CACHE_DISABLED ; W4 = BUS_ADDRESSES_l2CACHE_DISABLED
+add w3,w3,w4 ; W3 = BUS_ADDRESSES_l2CACHE_DISABLED + Control Block Data
+
 mov x4,PERIPHERAL_BASE
 orr x4,x4,DMA0_BASE ; X4 = DMA 0 Base
 mov w5,DMA_ACTIVE ; W5 = DMA Active Bit

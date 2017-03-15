@@ -45,7 +45,7 @@ add r0,r1 ; Place Text At XY Position 256,32
 
 adr r1,Font ; R1 = Characters
 adr r2,Text ; R2 = Text Offset
-adr r3,CB_STRUCT ; R3 = Control Block Data
+imm32 r3,BUS_ADDRESSES_l2CACHE_DISABLED + CB_STRUCT ; R3 = Control Block Data
 imm32 r4,PERIPHERAL_BASE + DMA0_BASE ; R4 = DMA 0 Base
 mov r5,DMA_ACTIVE ; R5 = DMA Active Bit
 mov r6,12 ; R6 = Number Of Text Characters To Print
