@@ -15,7 +15,7 @@ http://dex-os.github.io/DexBasic/DexBasic.htm<br />
 Also special thanks to phire, who helped me get my 1st triangle on the screen using the GPU =D<br />
 <br />
 Also special thanks to Jaymin Kessler, who helped me get my 1st textured triangle on the screen using the GPU =D<br />
-Please check out his blog here, especially for info on bare metal GPU programming on the Raspberry Pi:<br />
+Please check out his blog, especially for info on bare metal GPU programming on the Raspberry Pi:<br />
 http://maisonikkoku.com/<br />
 <br />
 Also special thanks to rst, who helped me get my 1st SMP demo running using all 4 CPU cores of the Raspberry Pi 2 =D<br />
