@@ -14,6 +14,10 @@ http://dex-os.github.io/DexBasic/DexBasic.htm<br />
 <br />
 Also special thanks to phire, who helped me get my 1st triangle on the screen using the GPU =D<br />
 <br />
+Also special thanks to Jaymin Kessler, who helped me get my 1st textured triangle on the screen using the GPU =D<br />
+Please checkout his blog here:<br />
+http://maisonikkoku.com/<br />
+<br />
 Also special thanks to rst, who helped me get my 1st SMP demo running using all 4 CPU cores of the Raspberry Pi 2 =D<br />
 Please check out Circle by rst, a C++ bare metal environment (with USB) for Raspberry Pi 1 & 2:<br />
 https://github.com/rsta2/circle<br />
