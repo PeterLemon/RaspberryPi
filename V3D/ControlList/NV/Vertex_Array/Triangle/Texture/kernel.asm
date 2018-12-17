@@ -537,8 +537,9 @@ FRAGMENT_SHADER_CODE:
   ; Tex S Coord: ACC0 = S * W + C, Tex T: ACC1 = T * W (R15A)
   ; Add Pipe: Floating Point Add, ACC0, ACC R0, ACC R5, Cond: Always
   ; Mul Pipe: Floating Point Multiply, ACC1, R15, VARYING_READ, Cond: Always
+  ; Signal: Wait For Scoreboard
   dw $213E3177
-  dw $10024821 ; fadd r0, r0, r5; fmul r1, ra15, vary; nop
+  dw $40024821 ; fadd r0, r0, r5; fmul r1, ra15, vary; sbwait
 
   ; Tex T Write Reg = T * W + C, Trigger First Sampler Param Uniform Read
   ; Add Pipe: Floating Point Add, TMU0_T, ACC R1, ACC R5, Cond: Always
@@ -562,16 +563,9 @@ FRAGMENT_SHADER_CODE:
   ; Exporting Read Texture Data To MRT0
   ; Add Pipe: Bitwise OR, TLB_COLOUR_ALL, ACC R4, ACC R4, Cond: Always
   ; Mul Op: No operation, Mul Cond: Never
-  ; Signal: Scoreboard Unlock
-  dw $159E7900
-  dw $50020BA7 ; mov tlbc, r4; nop; sbdone
-
-  ; Thread End
-  ; Add Op: No Operation, Add cond: Never
-  ; Mul Op: No Operation, Mul cond: Never
   ; Signal: Program End
-  dw $009E7000 ;
-  dw $300009E7 ; nop; nop; thrend
+  dw $159E7900
+  dw $30020BA7 ; mov tlbc, r4; nop; thrend
 
   ; Thread End Delay Slot 1
   ; Add Op: No Operation, Add cond: Never
@@ -582,8 +576,9 @@ FRAGMENT_SHADER_CODE:
   ; Thread End Delay Slot 2
   ; Add Op: No Operation, Add cond: Never
   ; Mul Op: No Operation, Mul cond: Never
+  ; Signal: Scoreboard Unlock
   dw $009E7000 ;
-  dw $100009E7 ; nop; nop; nop
+  dw $500009E7 ; nop; nop; sbdone
 
 align 4096 ; 4096 Byte Align
 Texture32x32: ; RGBA:8888 (32x32x32B = 4096 Bytes)
