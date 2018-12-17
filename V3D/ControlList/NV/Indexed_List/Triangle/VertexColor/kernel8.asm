@@ -543,15 +543,15 @@ FRAGMENT_SHADER_CODE:
   dw $958E0DBF
   dw $D1724823 ; mov r0, vary; mov r3.8d, 1.0
   dw $818E7176
-  dw $40024821 ; fadd r0, r0, r5; mov r1, vary
+  dw $40024821 ; fadd r0, r0, r5; mov r1, vary; sbwait
   dw $818E7376
-  dw $10024862 ; fadd r1, r1, r5; mov r2, vary
+  dw $10024862 ; fadd r1, r1, r5; mov r2, vary; nop
   dw $819E7540
-  dw $114248A3 ; fadd r2, r2, r5; mov r3.8a, r0
+  dw $114248A3 ; fadd r2, r2, r5; mov r3.8a, r0; nop
   dw $809E7009
-  dw $115049E3 ; nop; mov r3.8b, r1
+  dw $115049E3 ; nop; mov r3.8b, r1; nop
   dw $809E7012
-  dw $116049E3 ; nop; mov r3.8c, r2
+  dw $116049E3 ; nop; mov r3.8c, r2; nop
   dw $159E76C0
   dw $30020BA7 ; mov tlbc, r3; nop; thrend
   dw $009E7000
