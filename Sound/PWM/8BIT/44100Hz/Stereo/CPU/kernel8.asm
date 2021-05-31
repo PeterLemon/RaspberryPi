@@ -16,10 +16,10 @@ mrs x0,MPIDR_EL1 ; X0 = Multiprocessor Affinity Register (MPIDR)
 ands x0,x0,3 ; X0 = CPU ID (Bits 0..1)
 b.ne CoreLoop ; IF (CPU ID != 0) Branch To Infinite Loop (Core ID 1..3)
 
-; Set GPIO 40 & 45 (Phone Jack) To Alternate PWM Function 0
+; Set GPIO 40 & 41 (Phone Jack) To Alternate PWM Function 0
 mov w0,PERIPHERAL_BASE + GPIO_BASE
 mov w1,GPIO_FSEL0_ALT0
-orr w1,w1,GPIO_FSEL5_ALT0
+orr w1,w1,GPIO_FSEL1_ALT0
 str w1,[x0,GPIO_GPFSEL4]
 
 ; Set Clock
