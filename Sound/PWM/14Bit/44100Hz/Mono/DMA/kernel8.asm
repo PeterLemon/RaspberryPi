@@ -33,10 +33,10 @@ ConvertLoop:
   cmp w0,w2
   b.ne ConvertLoop
 
-; Set GPIO 40 & 45 (Phone Jack) To Alternate PWM Function 0
+; Set GPIO 40 & 41 (Phone Jack) To Alternate PWM Function 0
 mov w0,PERIPHERAL_BASE + GPIO_BASE
 mov w1,GPIO_FSEL0_ALT0
-orr w1,w1,GPIO_FSEL5_ALT0
+orr w1,w1,GPIO_FSEL1_ALT0
 str w1,[x0,GPIO_GPFSEL4]
 
 ; Set Clock
